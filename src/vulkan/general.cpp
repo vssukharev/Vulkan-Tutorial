@@ -45,6 +45,7 @@ void App::Cleanup(Vulkan& vk) noexcept
   vkDestroyRenderPass(vk.device, vk.render_pass, nullptr);
   for (auto& image_view : vk.swap_chain.image_views)
     vkDestroyImageView(vk.device, image_view, nullptr);
+  vkDestroySwapchainKHR(vk.device, vk.swap_chain.handle, nullptr);
   vkDestroyDevice(vk.device, nullptr);
   Dbg::DestroyDebugMessenger(vk);
   vkDestroySurfaceKHR(vk.instance, vk.surface, nullptr);

@@ -25,12 +25,12 @@ namespace App {
       type value;
   };
 
-  template <enumeration E>
-  FLAGS<E> operator|(E e1, E e2) 
-  {
-    using tp = FLAGS<E>::type;
-    return static_cast<tp>(e1) | static_cast<tp>(e2);
-  }
+  // template <enumeration E>
+  // FLAGS<E> operator|(E e1, E e2) 
+  // {
+  //   using tp = FLAGS<E>::type;
+  //   return static_cast<tp>(e1) | static_cast<tp>(e2);
+  // }
 
   template <enumeration E>
   FLAGS<E> operator|(FLAGS<E> fl, E e) 

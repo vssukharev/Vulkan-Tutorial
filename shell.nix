@@ -12,7 +12,6 @@
       vulkan-loader
       vulkan-validation-layers # maybe?
       vulkan-tools-lunarg
-      renderdoc
 
       libGL
       glfw

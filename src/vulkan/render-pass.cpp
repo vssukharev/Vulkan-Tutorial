@@ -35,7 +35,7 @@ void App::CreateRenderPass(Vulkan& vk)
   // We want subpass to use this layout while rendering attachment under index above
   color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-  VkSubpassDescription subpass {}; // set first 4 description flags ?
+  VkSubpassDescription subpass {};
   subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
   subpass.colorAttachmentCount = 1;
   subpass.pColorAttachments = &color_attachment_ref; // The index of the attachment in this array is directly referenced from the fragment shader with the 'layout(location = 0) out vec4 outColor' directive in fragment shader
