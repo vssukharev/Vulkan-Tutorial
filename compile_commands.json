@@ -1,0 +1,317 @@
+[
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/main.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/main.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/queues.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/queues.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/physical-devices.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/physical-devices.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/extensions-loader.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/extensions-loader.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/command-buffers.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/command-buffers.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/image-views.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/image-views.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/sync.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/sync.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/general.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/general.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/command-pool.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/command-pool.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/graphics-pipeline.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/graphics-pipeline.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/drawer.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/drawer.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/framebuffers.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/framebuffers.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/swap-chain.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/swap-chain.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/window-surface.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/window-surface.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/debug/misc.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/debug/misc.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/debug/validation-layers.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/debug/validation-layers.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/logical-devices.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/logical-devices.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/render-pass.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/render-pass.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/vulkan/instance.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/vulkan/instance.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/helpers/files.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/helpers/files.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  },
+  {
+    "arguments": [
+      "/nix/store/kp2j7yn0wzwq5piy494r54dafrh83s6s-gcc-wrapper-13.3.0/bin/g++",
+      "-c",
+      "-std=c++23",
+      "-O2",
+      "-Iinc",
+      "-o",
+      "./build/test",
+      "src/general.cpp"
+    ],
+    "directory": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle",
+    "file": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/src/general.cpp",
+    "output": "/home/starleks/notes/study/IT/graphics/vulkan/projects/hello-triangle/build/test"
+  }
+]
