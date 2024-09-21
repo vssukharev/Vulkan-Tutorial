@@ -24,7 +24,7 @@ namespace App {
   {
     uint32_t graphics_family;
     uint32_t present_family;
-    FLAGS<QUEUE_FAMILY_BITS> supported_families;
+    flags<QUEUE_FAMILIES_BITS> supported_families;
   };
   
   struct Vulkan_Queues 

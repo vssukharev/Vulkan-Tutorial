@@ -45,8 +45,8 @@ std::vector<VkDeviceQueueCreateInfo> App::Impl::GetVulkanQueueCreateInfos(Vulkan
 /// @return Validness of queue families
 bool App::Impl::CheckQueueFamiliesSupport(const Vulkan_QueueFamilies& qf)
 {
-  return qf.supported_families & QUEUE_FAMILY_BITS::GRAPHICS &&
-         qf.supported_families & QUEUE_FAMILY_BITS::PRESENTATION;
+  return qf.supported_families & QUEUE_FAMILIES_BITS::GRAPHICS &&
+         qf.supported_families & QUEUE_FAMILIES_BITS::PRESENTATION;
 }
 
 
@@ -56,21 +56,21 @@ void App::Impl::QueryQueueFamilies(Vulkan_QueueFamilies& qf, VkPhysicalDevice de
 {
   uint32_t queue_family_count = 0;
   vkGetPhysicalDeviceQueueFamilyProperties(dev, &queue_family_count, nullptr);
-  VkQueueFamilyProperties queue_families[queue_family_count];
-  vkGetPhysicalDeviceQueueFamilyProperties(dev, &queue_family_count, queue_families);
+  std::vector<VkQueueFamilyProperties> queue_families(queue_family_count);
+  vkGetPhysicalDeviceQueueFamilyProperties(dev, &queue_family_count, queue_families.data());
 
   uint32_t family_index = 0;
   for (const auto& queue_family : queue_families)
   {
     if (queue_family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-      qf.supported_families |= QUEUE_FAMILY_BITS::GRAPHICS;
+      qf.supported_families |= QUEUE_FAMILIES_BITS::GRAPHICS;
       qf.graphics_family = family_index;
     }
     
     VkBool32 present_support = false;
     vkGetPhysicalDeviceSurfaceSupportKHR(dev, family_index, surface, &present_support);
     if (present_support) {
-      qf.supported_families |= QUEUE_FAMILY_BITS::PRESENTATION;
+      qf.supported_families |= QUEUE_FAMILIES_BITS::PRESENTATION;
       qf.present_family = family_index;
     }
 
