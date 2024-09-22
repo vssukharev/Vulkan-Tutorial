@@ -3,12 +3,12 @@
 My first dwelling into computer graphics overall and with Vulkan, in particular.
 
 
-Commands (go to directory working-triangle if you want to check the working one)
+## Build
+
 ```console
-$ make run       # compile and run
-$ make shaders   # compile shaders only
-$ make debug     # compile with debug flag
-$ ./build/test   # run compiled app
+$ meson setup build            # setup build directoty
+$ meson compile -C build       # compile everything
+$ ./build/tutorial             # run app
 ```
 
 

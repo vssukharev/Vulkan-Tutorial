@@ -135,7 +135,7 @@ int App::Impl::RateSwapSurfaceFormat(VkSurfaceFormatKHR sf_format)
 {
   int score = 0;
 
-  if ( sf_format.format     == VK_FORMAT_B8G8R8A8_UNORM && 
+  if ( sf_format.format     == VK_FORMAT_B8G8R8A8_SRGB && 
        sf_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR ) 
     score = 10;
 

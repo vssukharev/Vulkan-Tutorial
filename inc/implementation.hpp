@@ -6,16 +6,11 @@
 #include <cwchar>
 #include <hello-triangle.hpp>
 #include <config.hpp>
-#include <string>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
 namespace App::Impl {
-  // ------ Files ------
-  std::vector<char> ReadShaderCode(const std::string& shader_name);
-  std::vector<char> ReadFile(const std::string& filename);
-  // ------------------
-
+  
   // ------ Vulkan ------
   // --- Helper structs
   struct Vulkan_SwapChainSupportDetails

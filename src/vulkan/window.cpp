@@ -1,16 +1,27 @@
 
 #include "hello-triangle.hpp"
+#include <GLFW/glfw3.h>
 #include <implementation.hpp>
 #include <except.hpp>
 #include <iostream>
 
 #include <debug.hpp>
 
+
+///
+void App::InitGLFW()
+{
+  // glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
+  glfwInit();
+}
+
 ///
 void App::CreateWindow(Vulkan& vk)
 {
-  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // Prohibit GLFW creating OpenGL instance
-  glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // Disable window resizing (for now) due to complexity of its handling
+  // Prohibit GLFW creating OpenGL instance
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); 
+  // Disable window resizing (for now) due to complexity of its handling
+  glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); 
   vk.window = glfwCreateWindow(800, 600, "Vulkan", nullptr, nullptr);
 
   Dbg::PrintFunctionInfo(__FUNCTION__, "GLFW window created");

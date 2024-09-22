@@ -1,2 +1,7 @@
+compile_commands.json
+
 .cache/
 build/
+build-meson/
+sample/
+

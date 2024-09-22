@@ -19,7 +19,7 @@ void App::DrawFrame(Vulkan& vk)
 
   uint32_t image_index;
   // Acquire image from GPU and set 'image_available_semaphore' as submit one
-  vkAcquireNextImageKHR(vk.device, vk.swap_chain.handle, UINT64_MAX, vk.sync.image_available_semaphore, VK_NULL_HANDLE, &image_index);
+  bool res = vkAcquireNextImageKHR(vk.device, vk.swap_chain.handle, UINT64_MAX, vk.sync.image_available_semaphore, VK_NULL_HANDLE, &image_index);
 
   // Dbg::PrintFunctionInfo(__FUNCTION__, "vkAcquireNextImageKHR result - ", std::boolalpha, res); 
   
@@ -45,8 +45,9 @@ void App::DrawFrame(Vulkan& vk)
   submit_info.pCommandBuffers = &vk.command_buffer;
 
   // in_flight_fence will be signaled when the command buffer finish execution
-  if ( vkQueueSubmit(vk.queues.graphics_queue, 1, &submit_info, vk.sync.in_flight_fence) )
+  if ( vkQueueSubmit(vk.queues.graphics_queue, 1, &submit_info, vk.sync.in_flight_fence) != VK_SUCCESS )
     throw Except::Queue_Submittion_Failure{Impl::ConcatToStr(__FUNCTION__, " - failed to submit draw command buffer").c_str()};
+  
   // Dbg::PrintFunctionInfo(__FUNCTION__, "Submitted draw command buffer");
 
   VkPresentInfoKHR present_info {};
@@ -60,7 +61,7 @@ void App::DrawFrame(Vulkan& vk)
   present_info.pResults = nullptr;
 
   // TODO: check for errors
-  vkQueuePresentKHR(vk.queues.presentation_queue, &present_info);
+  res = vkQueuePresentKHR(vk.queues.presentation_queue, &present_info);
 
   // Dbg::PrintFunctionInfo(__FUNCTION__, "vkQueuePresentKHR result - ", std::boolalpha, res); 
 }

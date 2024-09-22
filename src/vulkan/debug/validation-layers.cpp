@@ -38,7 +38,7 @@ void App::Dbg::CheckValidationLayersSupport()
   }
 
   if (unavailable_val_layers.size() != 0)
-    throw Except::Val_Layers_Missing{__PRETTY_FUNCTION__};
+    throw Except::Val_Layers_Missing{unavailable_val_layers[0]};
 #endif // !NDEBUG
 }
 

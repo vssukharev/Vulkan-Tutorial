@@ -3,18 +3,19 @@
 #include <vulkan/vulkan_core.h>
 #include <except.hpp>
 #include <debug.hpp>
+#include <helpers/files.hpp>
 
 ///
-void App::CreateGraphicsPipeline(Vulkan& vk)
+void App::CreateGraphicsPipeline(Vulkan& vk, Meta& meta)
 {
   // --- Shaders ---
-  auto vert_shader_code = Impl::ReadShaderCode("vert.spv");
+  auto vert_shader_code = Impl::ReadShaderCode(meta.binary_dir, "vert.spv");
   VkShaderModule vert_shader_module = Impl::CreateShaderModule(vk.device, vert_shader_code);
   Dbg::PrintFunctionInfo(__FUNCTION__, "Created vertex shader module");
   vert_shader_code.clear();
   vert_shader_code.shrink_to_fit();
   
-  auto frag_shader_code = Impl::ReadShaderCode("frag.spv");
+  auto frag_shader_code = Impl::ReadShaderCode(meta.binary_dir, "frag.spv");
   VkShaderModule frag_shader_module = Impl::CreateShaderModule(vk.device, frag_shader_code);
   Dbg::PrintFunctionInfo(__FUNCTION__, "Created fragment shader module");
   frag_shader_code.clear();

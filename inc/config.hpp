@@ -22,7 +22,7 @@ namespace App {
   };
 
   constexpr const char* PROJECT_NAME = "hello-triangle";
-  constexpr const char* BUILD_DIR_REL = "build";
+  constexpr const char* SHADERS_DIR = "src/shaders";
 }
 
 namespace App::Dbg {
@@ -41,7 +41,7 @@ namespace App::Dbg {
 
   const std::vector<const char*> gl_validation_layers {
 #ifndef NDEBUG
-    "VK_LAYER_KHRONOS_validation"
+    "VK_LAYER_KHRONOS_validation",
     // "VK_LAYER_LUNARG_api_dump"
 #endif // !NDEBUG
   };

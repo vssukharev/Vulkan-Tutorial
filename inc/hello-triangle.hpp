@@ -3,6 +3,7 @@
 
 
 #include <cstdint>
+#include <filesystem>
 #include <vector>
 
 #define GLFW_INCLUDE_VULKAN
@@ -16,6 +17,12 @@
 
 namespace App {
   // ----------------------- DATA ------------------------
+
+  // ------ Meta information ------
+  struct Meta 
+  {
+    std::filesystem::path binary_dir;
+  };
 
   // ------ Vulkan instances ------
 
@@ -87,6 +94,7 @@ namespace App {
   struct Data 
   {
     Vulkan vulkan;
+    Meta meta;
   };
 
   /// Initializes data on heap
@@ -113,9 +121,13 @@ namespace App {
   void Cleanup(Data&);
   // ---------------------
 
+  // ------ Meta ------
+  void Init(Meta&);
+  // ------------------
 
   // ------ Vulkan ------
-  void Init(Vulkan&);
+  void Init(Vulkan&, Meta&);
+  void InitGLFW();
   void Cleanup(Vulkan&) noexcept;
   void CreateWindow(Vulkan&);
   void CreateInstance(Vulkan&);
@@ -126,7 +138,7 @@ namespace App {
   void CreateSwapChain(Vulkan&);
   void CreateImageViews(Vulkan&);
   void CreateRenderPass(Vulkan&);
-  void CreateGraphicsPipeline(Vulkan&);
+  void CreateGraphicsPipeline(Vulkan&, Meta&);
   void CreateFramebuffers(Vulkan&);
   void CreateCommandPool(Vulkan&);
   void CreateCommandBuffer(Vulkan&);

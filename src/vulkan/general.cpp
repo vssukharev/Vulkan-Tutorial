@@ -11,9 +11,9 @@
 
 
 /// Initializes Vulkan instance and GLFW surface
-void App::Init(Vulkan& vk)
+void App::Init(Vulkan& vk, Meta& meta)
 {
-  glfwInit();
+  InitGLFW();
   CreateWindow(vk);
   CreateInstance(vk);
   Dbg::CreateDebugMessenger(vk);
@@ -23,7 +23,7 @@ void App::Init(Vulkan& vk)
   CreateSwapChain(vk);
   CreateImageViews(vk);
   CreateRenderPass(vk);
-  CreateGraphicsPipeline(vk);
+  CreateGraphicsPipeline(vk, meta);
   CreateFramebuffers(vk);
   CreateCommandPool(vk);
   CreateCommandBuffer(vk);

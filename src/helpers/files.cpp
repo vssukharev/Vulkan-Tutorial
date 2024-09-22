@@ -6,12 +6,14 @@
 #include <ios>
 #include <iostream>
 #include <cstdlib>
+#include <iterator>
+#include <limits.h>
 
 #include <implementation.hpp>
 #include <except.hpp>
 #include <config.hpp>
 #include <debug.hpp>
-#include <string>
+#include <helpers/files.hpp>
 
 
 /// 
@@ -35,16 +37,23 @@ std::vector<char> App::Impl::ReadFile(const std::string& filename)
 }
 
 /// Assumes that you are in root directory of project
-std::vector<char> App::Impl::ReadShaderCode(const std::string& shader_name)
+std::vector<char> App::Impl::ReadShaderCode(std::filesystem::path binary_dir, const std::string& shader_name)
 {
-  std::filesystem::path path = std::filesystem::current_path();
-  path /= BUILD_DIR_REL;
-  path /= shader_name;
+  binary_dir /= SHADERS_DIR;
+  binary_dir /= shader_name;
 
-  Dbg::PrintFunctionInfo(__FUNCTION__, "Shader's full path = ", path);
-    
-  std::vector<char> shader_code = Impl::ReadFile(path);
+  Dbg::PrintFunctionInfo(__FUNCTION__, "Shader's full path = ", binary_dir);
+ 
+  std::vector<char> shader_code = Impl::ReadFile(binary_dir);
   return shader_code;
+}
+
+///
+std::filesystem::path App::Impl::GetBinaryPath()
+{
+  std::filesystem::path res;
+  res = std::filesystem::read_symlink("/proc/self/exe");
+  return res;
 }
 
 
