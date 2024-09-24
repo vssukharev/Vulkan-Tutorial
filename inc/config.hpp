@@ -21,6 +21,7 @@ namespace App {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME
   };
 
+  constexpr const int MAX_FRAMES_IN_FLIGHT = 2;
   constexpr const char* PROJECT_NAME = "hello-triangle";
   constexpr const char* SHADERS_DIR = "src/shaders";
 }

@@ -52,11 +52,15 @@ namespace App {
 
   struct Vulkan_Sync
   {
-    VkSemaphore image_available_semaphore;
-    VkSemaphore render_finished_semaphore;
-    VkFence in_flight_fence;
+    std::vector<VkSemaphore> image_available_semaphores;
+    std::vector<VkSemaphore> render_finished_semaphores;
+    std::vector<VkFence> in_flight_fences;
   };
 
+  struct Vulkan_Frame
+  {
+    uint32_t current;
+  };
 
   // --- Debug struct
   struct Vulkan_Debug 
@@ -71,6 +75,8 @@ namespace App {
     Vulkan_Queues queues;
     Vulkan_QueueFamilies queue_families;
     Vulkan_Sync sync;
+    std::vector<VkCommandBuffer> command_buffers;
+    Vulkan_Frame frame;
     VkDevice device;
     VkPhysicalDevice physical_device = VK_NULL_HANDLE;
     VkSurfaceKHR surface;
@@ -79,7 +85,6 @@ namespace App {
     VkRenderPass render_pass;
     VkPipeline graphics_pipeline;
     VkCommandPool command_pool;
-    VkCommandBuffer command_buffer;
     GLFWwindow* window;
 
 #ifndef NDEBUG
@@ -141,10 +146,10 @@ namespace App {
   void CreateGraphicsPipeline(Vulkan&, Meta&);
   void CreateFramebuffers(Vulkan&);
   void CreateCommandPool(Vulkan&);
-  void CreateCommandBuffer(Vulkan&);
+  void CreateCommandBuffers(Vulkan&);
   void CreateSyncObjects(Vulkan&);
 
-  void RecordCommandBuffer(Vulkan&, uint32_t image_index);
+  void RecordCommandBuffer(Vulkan&, uint32_t buffer_index, uint32_t image_index);
 
   void DrawFrame(Vulkan&);
   // --------------------
