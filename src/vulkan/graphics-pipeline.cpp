@@ -15,13 +15,13 @@ void App::CreateGraphicsPipeline(
     const std::filesystem::path& binary_dir)
 {
   // --- Shaders ---
-  auto vert_shader_code = Impl::ReadShaderCode(binary_dir, "vert.spv");
+  auto vert_shader_code = ReadShaderCode(binary_dir, "vert.spv");
   VkShaderModule vert_shader_module = CreateShaderModule(logical_device, vert_shader_code);
   Dbg::PrintFunctionInfo(__FUNCTION__, "Created vertex shader module");
   vert_shader_code.clear();
   vert_shader_code.shrink_to_fit();
   
-  auto frag_shader_code = Impl::ReadShaderCode(binary_dir, "frag.spv");
+  auto frag_shader_code = ReadShaderCode(binary_dir, "frag.spv");
   VkShaderModule frag_shader_module = CreateShaderModule(logical_device, frag_shader_code);
   Dbg::PrintFunctionInfo(__FUNCTION__, "Created fragment shader module");
   frag_shader_code.clear();
@@ -171,7 +171,7 @@ void App::CreateGraphicsPipeline(
 
 
 /// Creates shader module. Passed vector 'code' may be cleared after module creation.
-VkShaderModule App::CreateShaderModule(VkDevice dev, const std::vector<char>& code)
+VkShaderModule App::CreateShaderModule(VkDevice dev, const std::string& code)
 {
   VkShaderModuleCreateInfo create_info {};
   create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;

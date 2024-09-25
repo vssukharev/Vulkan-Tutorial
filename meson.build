@@ -12,7 +12,12 @@ project(
 
 cc = meson.get_compiler('cpp')
 
+
 add_project_arguments('-O2', language : 'cpp')
+
+if get_option('create_debug_symbols')
+  add_project_arguments('-g', language : 'cpp')
+endif
 
 project_sources = []
 project_header_files = []

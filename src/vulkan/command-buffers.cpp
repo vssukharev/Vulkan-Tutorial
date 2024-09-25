@@ -12,7 +12,7 @@ void App::CreateCommandBuffers(
     VkDevice logical_device,
     VkCommandPool command_pool)
 {
-  command_buffers.resize(MAX_FRAMES_IN_FLIGHT);
+  command_buffers.reallocate(MAX_FRAMES_IN_FLIGHT);
 
   VkCommandBufferAllocateInfo alloc_info {};
   alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;

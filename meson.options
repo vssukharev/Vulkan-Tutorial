@@ -1,0 +1,3 @@
+
+option('create_debug_symbols', type : 'boolean', value : false)
+

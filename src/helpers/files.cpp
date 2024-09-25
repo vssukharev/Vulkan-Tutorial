@@ -16,7 +16,7 @@
 
 
 /// 
-std::vector<char> App::Impl::ReadFile(const std::string& filename)
+std::string App::ReadFile(const std::string& filename)
 {
   std::ifstream file(filename, std::ios::ate | std::ios::binary );
 
@@ -24,7 +24,8 @@ std::vector<char> App::Impl::ReadFile(const std::string& filename)
     throw Except::File_Open_Failure{filename.c_str()};
 
   size_t file_size = file.tellg();
-  std::vector<char> buffer(file_size);
+  std::string buffer;
+  buffer.resize(file_size);
 
   Dbg::PrintFunctionInfo(__FUNCTION__, "File size = ", file_size, "; Buffer size = ", buffer.size());
 
@@ -36,19 +37,19 @@ std::vector<char> App::Impl::ReadFile(const std::string& filename)
 }
 
 /// Assumes that you are in root directory of project
-std::vector<char> App::Impl::ReadShaderCode(std::filesystem::path binary_dir, const std::string& shader_name)
+std::string App::ReadShaderCode(std::filesystem::path binary_dir, const std::string& shader_name)
 {
   binary_dir /= SHADERS_DIR;
   binary_dir /= shader_name;
 
   Dbg::PrintFunctionInfo(__FUNCTION__, "Shader's full path = ", binary_dir);
- 
-  std::vector<char> shader_code = Impl::ReadFile(binary_dir);
+
+  std::string shader_code = ReadFile(binary_dir);
   return shader_code;
 }
 
 ///
-std::filesystem::path App::Impl::GetBinaryPath()
+std::filesystem::path App::GetBinaryPath()
 {
   std::filesystem::path res;
   res = std::filesystem::read_symlink("/proc/self/exe");

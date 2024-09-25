@@ -24,7 +24,7 @@ void App::CreateInstance(VkInstance& instance)
   create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
   create_info.pApplicationInfo = &app_info;
   
-  std::vector<const char*> extensions = GetRequiredVulkanExtensions();
+  auto extensions = GetRequiredVulkanExtensions();
   create_info.enabledExtensionCount = extensions.size();
   create_info.ppEnabledExtensionNames = extensions.data();
 

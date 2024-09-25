@@ -1,5 +1,6 @@
   
 #include <cstdint>
+#include <helpers/mini-vec.hpp>
 
 #pragma once
 
@@ -10,5 +11,8 @@ namespace App {
     GRAPHICS = 0x01,
     PRESENTATION = 0x02,
   };
+
+  template <typename T>
+  using Container = mini_vec<T>;
 }
 

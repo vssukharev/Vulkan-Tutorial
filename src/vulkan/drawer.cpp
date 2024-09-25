@@ -91,6 +91,7 @@ void App::DrawFrame(
   // TODO: check for errors
   vkQueuePresentKHR(queues.presentation_queue, &present_info);
 
+
   // Dbg::PrintFunctionInfo(__FUNCTION__, "vkQueuePresentKHR result - ", std::boolalpha, res); 
   rLastFrame = (rLastFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }

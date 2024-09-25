@@ -36,40 +36,11 @@ void App::Cleanup(Data& data)
 
 /// Starting point
 int main() {
-  // App::Data data {};
-  //
-  // Init(data); 
+  App::Data data {};
+
+  Init(data); 
   // MainLoop(data);
-  // Cleanup(data);
-  
-  App::mini_vec<int> vec {1, 2, 3};
-
-  vec[0] = 2;
-  vec[2] = 4;
-  vec.expand(1);
-  vec[3] = 500;
-  
-  for (int elem : vec) {
-    std::cout << elem << '\n';
-  }
-  std::cout << "---------\n";
-
-  App::mini_vec<int> vec2 = vec;
-  for (int elem : vec2) {
-    std::cout << elem << '\n';
-  }
-
-  std::cout << "---------\n";
-  App::mini_vec<int> vec3 {3, 2, 3, 4};
-  for (int elem : vec3) {
-    std::cout << elem << '\n';
-  }
-  std::cout << "---------\n";
-
-  vec2 = vec3;
-  for (int elem : vec2) {
-    std::cout << elem << '\n';
-  }
+  Cleanup(data);
 
   return EXIT_SUCCESS;
 }

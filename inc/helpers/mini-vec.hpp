@@ -1,9 +1,12 @@
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdlib>
 #include <initializer_list>
 #include <utility>
 #include <iostream>
+
+#pragma once
 
 namespace App {
   template <typename T>
@@ -30,6 +33,7 @@ namespace App {
 
       mini_vec(const mini_vec& o)
       {
+        std::cout << __FUNCTION__ << '\n';
         T* new_elem = new T[o.size()];
 
         try {
@@ -46,6 +50,7 @@ namespace App {
 
       mini_vec(mini_vec&& o) : elem{o.elem}, sz{o.sz}
       {
+        std::cout << __FUNCTION__ << '\n';
         o.elem = nullptr; 
         o.sz = 0;
       }
@@ -110,15 +115,24 @@ namespace App {
 
     public:
       std::size_t size() const { return sz; }
+      
       T* data() { return elem; }
       const T* data() const { return elem; }
+      
+      bool empty() const { return sz == 0; }
+      
+      void deallocate()
+      {
+        delete[] elem;
+        sz = 0;
+      }
 
       void reallocate(std::size_t newSize)
       {
         T* new_elem = new T[newSize];
 
-        for (std::size_t i = 0; i != sz; ++i)
-          new_elem[i] = std::move(elem[i]);
+        for (std::size_t i = 0; i != std::min(newSize, sz); ++i)
+          new_elem[i] = elem[i];
 
         delete[] elem;
         elem = new_elem;

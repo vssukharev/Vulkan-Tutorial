@@ -14,7 +14,7 @@ void App::CreateImageViews(
     VkFormat imageFormat,
     VkDevice logicalDevice)
 {
-  rImageViews.resize(rImages.size());
+  rImageViews.reallocate(rImages.size());
   
   for (std::size_t i = 0; i != rImages.size(); ++i) {
     VkImageViewCreateInfo create_info {};

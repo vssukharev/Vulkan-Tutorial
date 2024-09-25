@@ -13,15 +13,13 @@
 #include <vulkan/vulkan_core.h>
 
 #include <helpers/flags.hpp>
+#include <helpers/mini-vec.hpp>
 #include <decl.hpp>
 
 namespace App {
   // ----------------------- DATA ------------------------
   
   // --------- Aliases ----------
-  template <typename T>
-  using Container = std::vector<T>;
-
   using Window = GLFWwindow*;
   using Images = Container<VkImage>;
   using ImageViews = Container<VkImageView>;
@@ -254,10 +252,14 @@ namespace App {
   // --- Helper structs
   
   // --- Extensions
-  Container<const char*> GetRequiredVulkanExtensions() noexcept;
+  std::vector<const char*> GetRequiredVulkanExtensions() noexcept;
 
   // --- Devices
-  int RatePhysicalDeviceSuitability(VkPhysicalDevice, QueueFamilies&, SwapChainSupportDetails&) noexcept;
+  int RatePhysicalDeviceSuitability(
+      VkPhysicalDevice, 
+      QueueFamilies&, 
+      SwapChainSupportDetails&) noexcept;
+
   bool CheckPhysicalDeviceExtensionsSupport(VkPhysicalDevice);
   void QueryQueueFamilies(QueueFamilies&, VkPhysicalDevice, VkSurfaceKHR);
   bool CheckQueueFamiliesSupport(const QueueFamilies&);
@@ -269,7 +271,7 @@ namespace App {
   VkPresentModeKHR ChooseSwapPresentMode(const Container<VkPresentModeKHR>&);
   int RateSwapPresentMode(VkPresentModeKHR);
   VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR&, GLFWwindow*);
-  VkShaderModule CreateShaderModule(VkDevice dev, const Container<char>& code);
+  VkShaderModule CreateShaderModule(VkDevice dev, const std::string& code);
   // --------------------
 
   // --------------------

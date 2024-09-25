@@ -79,7 +79,7 @@ void App::CreateSwapChain(
 
   // Retrieve image handles
   vkGetSwapchainImagesKHR(logical_device, swap_chain, &image_count, nullptr);
-  images.resize(image_count);
+  images.reallocate(image_count);
   vkGetSwapchainImagesKHR(logical_device, swap_chain, &image_count, images.data());
 
   image_format = surface_format.format;
@@ -103,7 +103,7 @@ void App::QuerySwapChainSupport(SwapChainSupportDetails& details, VkPhysicalDevi
   vkGetPhysicalDeviceSurfaceFormatsKHR(dev, surface, &format_count, nullptr);
   if (format_count != 0) 
   {
-    details.formats.resize(format_count);
+    details.formats.reallocate(format_count);
     vkGetPhysicalDeviceSurfaceFormatsKHR(dev, surface, &format_count, details.formats.data());
   }
 
@@ -111,14 +111,14 @@ void App::QuerySwapChainSupport(SwapChainSupportDetails& details, VkPhysicalDevi
   vkGetPhysicalDeviceSurfacePresentModesKHR(dev, surface, &present_mode_count, nullptr);
   if (present_mode_count != 0) 
   {
-    details.present_modes.resize(present_mode_count);
+    details.present_modes.reallocate(present_mode_count);
     vkGetPhysicalDeviceSurfacePresentModesKHR(dev, surface, &format_count, details.present_modes.data());
   }
 }
 
 
 /// @return the most appropriate format
-VkSurfaceFormatKHR App::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& available_formats)
+VkSurfaceFormatKHR App::ChooseSwapSurfaceFormat(const Container<VkSurfaceFormatKHR>& available_formats)
 {
   std::size_t best_candidate_index = 0;
   int best_score = 0;
@@ -152,7 +152,7 @@ int App::RateSwapSurfaceFormat(VkSurfaceFormatKHR sf_format)
 
 
 ///
-VkPresentModeKHR App::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& present_modes)
+VkPresentModeKHR App::ChooseSwapPresentMode(const Container<VkPresentModeKHR>& present_modes)
 {
   std::size_t best_candidate_index = 0;
   int best_score = 0;
