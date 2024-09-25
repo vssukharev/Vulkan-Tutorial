@@ -1,34 +1,38 @@
 
-#include <implementation.hpp>
 #include <except.hpp>
 #include <debug.hpp>
+#include <hello-triangle.hpp>
 #include <vulkan/vulkan_core.h>
 
 ///
-void App::CreateRenderPass(Vulkan& vk)
+void App::CreateRenderPass(
+    VkRenderPass& render_pass,
+    VkFormat image_format,
+    VkDevice logical_device)
 {
   VkAttachmentDescription color_attachment {};
-  color_attachment.format = vk.swap_chain.image_format;
+  color_attachment.format = image_format;
   color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+  color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR; 
+  color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE; 
+  color_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+  color_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+  color_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+  color_attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
   // loadOp - is what to do with data before rendering
   // VK_ATTACHMENT_LOAD_OP_LOAD - preserve the existing contents
   // VK_ATTACHMENT_LOAD_OP_CLEAR - clear the values to a constant
   // VK_ATTACHMENT_LOAD_OP_DONT_CARE - existing contents are undefined; we don't caare about them
-  color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR; 
   // storeOp - is what to do with data after rendering
   // VK_ATTACHMENT_STORE_OP_STORE - rendered contents will be stored in memory and can be read later
   // VK_ATTACHMENT_STORE_OP_DONT_CARE - contents of the framebuffer will be undefined after rendering operation
-  color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE; 
-  color_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-  color_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-  // Most popular layouts
+  // initialLayout or finalLayout
   // VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL - images are used as color attachments
   // VK_IMAGE_LAYOUT_PRESENT_SRC_KHR - images are presented in the swap chain
   // VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL - images are used as destination for a memory copy operation
   // initialLayout - image layout before rendering
   // finalLayout - image layout when render pass finishes
-  color_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-  color_attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
 
   VkAttachmentReference color_attachment_ref {};
   color_attachment_ref.attachment = 0;
@@ -63,9 +67,9 @@ void App::CreateRenderPass(Vulkan& vk)
   render_pass_info.dependencyCount = 1;
   render_pass_info.pDependencies = &dependency;
 
-  if (vkCreateRenderPass(vk.device, &render_pass_info, nullptr, &vk.render_pass) != VK_SUCCESS)
+  if (vkCreateRenderPass(logical_device, &render_pass_info, nullptr, &render_pass) != VK_SUCCESS)
     throw Except::Render_Pass_Creation_Failure{__FUNCTION__};
+  
   Dbg::PrintFunctionInfo(__FUNCTION__, "Created render pass");
-
 }
 

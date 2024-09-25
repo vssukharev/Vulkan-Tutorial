@@ -3,25 +3,7 @@
 
 #include <hello-triangle.hpp>
 #include <except.hpp>
-
-
-// --- Data_Class ---
-App::Data_Class::Data_Class() : pdata{new Data{}} {}
-App::Data_Class::~Data_Class() { delete pdata; }
-App::Data& App::Data_Class::get() { return *pdata; }
-App::Data_Class::operator Data&() { return *pdata; }
-// ------------------
-
-
-/// Fully runs application
-void App::Run() 
-{
-  Data data {};
-
-  Init(data); 
-  MainLoop(data);
-  Cleanup(data);
-}
+#include <helpers/mini-vec.hpp>
 
 
 /// Initializes application
@@ -38,7 +20,7 @@ void App::MainLoop(Data& data)
   while ( !glfwWindowShouldClose(data.vulkan.window) ) 
   {
     glfwPollEvents();
-    DrawFrame(data.vulkan);
+    DrawFrame(data);
   }
 
   vkDeviceWaitIdle(data.vulkan.device);
@@ -52,8 +34,42 @@ void App::Cleanup(Data& data)
 }
 
 
-/// Statrting point
+/// Starting point
 int main() {
-  App::Run();
+  // App::Data data {};
+  //
+  // Init(data); 
+  // MainLoop(data);
+  // Cleanup(data);
+  
+  App::mini_vec<int> vec {1, 2, 3};
+
+  vec[0] = 2;
+  vec[2] = 4;
+  vec.expand(1);
+  vec[3] = 500;
+  
+  for (int elem : vec) {
+    std::cout << elem << '\n';
+  }
+  std::cout << "---------\n";
+
+  App::mini_vec<int> vec2 = vec;
+  for (int elem : vec2) {
+    std::cout << elem << '\n';
+  }
+
+  std::cout << "---------\n";
+  App::mini_vec<int> vec3 {3, 2, 3, 4};
+  for (int elem : vec3) {
+    std::cout << elem << '\n';
+  }
+  std::cout << "---------\n";
+
+  vec2 = vec3;
+  for (int elem : vec2) {
+    std::cout << elem << '\n';
+  }
+
   return EXIT_SUCCESS;
 }

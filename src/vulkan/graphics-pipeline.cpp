@@ -1,22 +1,28 @@
 #include <cstdint>
-#include <implementation.hpp>
 #include <vulkan/vulkan_core.h>
+
+#include <helpers/files.hpp>
 #include <except.hpp>
 #include <debug.hpp>
-#include <helpers/files.hpp>
+#include <hello-triangle.hpp>
 
 ///
-void App::CreateGraphicsPipeline(Vulkan& vk, Meta& meta)
+void App::CreateGraphicsPipeline(
+    VkPipeline& graphics_pipeline,
+    VkPipelineLayout& pipeline_layout,
+    VkDevice logical_device,
+    VkRenderPass render_pass,
+    const std::filesystem::path& binary_dir)
 {
   // --- Shaders ---
-  auto vert_shader_code = Impl::ReadShaderCode(meta.binary_dir, "vert.spv");
-  VkShaderModule vert_shader_module = Impl::CreateShaderModule(vk.device, vert_shader_code);
+  auto vert_shader_code = Impl::ReadShaderCode(binary_dir, "vert.spv");
+  VkShaderModule vert_shader_module = CreateShaderModule(logical_device, vert_shader_code);
   Dbg::PrintFunctionInfo(__FUNCTION__, "Created vertex shader module");
   vert_shader_code.clear();
   vert_shader_code.shrink_to_fit();
   
-  auto frag_shader_code = Impl::ReadShaderCode(meta.binary_dir, "frag.spv");
-  VkShaderModule frag_shader_module = Impl::CreateShaderModule(vk.device, frag_shader_code);
+  auto frag_shader_code = Impl::ReadShaderCode(binary_dir, "frag.spv");
+  VkShaderModule frag_shader_module = CreateShaderModule(logical_device, frag_shader_code);
   Dbg::PrintFunctionInfo(__FUNCTION__, "Created fragment shader module");
   frag_shader_code.clear();
   frag_shader_code.shrink_to_fit();
@@ -130,7 +136,7 @@ void App::CreateGraphicsPipeline(Vulkan& vk, Meta& meta)
   pipeline_layout_info.pushConstantRangeCount = 0;
   pipeline_layout_info.pPushConstantRanges = nullptr;
 
-  if (vkCreatePipelineLayout(vk.device, &pipeline_layout_info, nullptr, &vk.pipeline_layout) != VK_SUCCESS)
+  if (vkCreatePipelineLayout(logical_device, &pipeline_layout_info, nullptr, &pipeline_layout) != VK_SUCCESS)
     throw Except::Pipeline_Layout_Creation_Failure{__FUNCTION__};
   Dbg::PrintFunctionInfo(__FUNCTION__, "Created pipeline layout");
   
@@ -147,24 +153,25 @@ void App::CreateGraphicsPipeline(Vulkan& vk, Meta& meta)
   // pipeline_info.pDepthStencilState = nullptr;
   pipeline_info.pColorBlendState = &color_blending;
   pipeline_info.pDynamicState = &dynamic_state;
-  pipeline_info.layout = vk.pipeline_layout;
-  pipeline_info.renderPass = vk.render_pass;
+  pipeline_info.layout = pipeline_layout;
+  pipeline_info.renderPass = render_pass;
   pipeline_info.subpass = 0;
   pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
 
 
-  if (vkCreateGraphicsPipelines(vk.device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &vk.graphics_pipeline) != VK_SUCCESS)
+  if (vkCreateGraphicsPipelines(logical_device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &graphics_pipeline) != VK_SUCCESS)
     throw Except::Graphics_Pipeline_Creation_Failure{__FUNCTION__};
+
   Dbg::PrintFunctionInfo(__FUNCTION__, "Created graphics pipeline");
 
   // --- Clearing Up ---
-  vkDestroyShaderModule(vk.device, vert_shader_module, nullptr);
-  vkDestroyShaderModule(vk.device, frag_shader_module, nullptr);
+  vkDestroyShaderModule(logical_device, vert_shader_module, nullptr);
+  vkDestroyShaderModule(logical_device, frag_shader_module, nullptr);
 }
 
 
 /// Creates shader module. Passed vector 'code' may be cleared after module creation.
-VkShaderModule App::Impl::CreateShaderModule(VkDevice dev, const std::vector<char>& code)
+VkShaderModule App::CreateShaderModule(VkDevice dev, const std::vector<char>& code)
 {
   VkShaderModuleCreateInfo create_info {};
   create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;

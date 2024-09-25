@@ -2,48 +2,27 @@
 #include "hello-triangle.hpp"
 #include <set>
 
-#include <implementation.hpp>
+#include <hello-triangle.hpp>
 #include <debug.hpp>
+#include <vulkan/vulkan_core.h>
 
-/// Finds and sets queue families for vk.physical_device (safe version)
-/// Operation not performed if queue families are already set
-/// NOTE: not really sure should it be called only once or every time
-void App::SetQueueFamilies(Vulkan& vk)
+
+///
+void App::SetQueueFamilies(QueueFamilies& qf, VkPhysicalDevice physical_dev, VkSurfaceKHR surface)
 {
-  if ( !Impl::CheckQueueFamiliesSupport(vk.queue_families) )
-    Impl::QueryQueueFamilies(vk.queue_families, vk.physical_device, vk.surface);
+  if ( !CheckQueueFamiliesSupport(qf) )
+    QueryQueueFamilies(qf, physical_dev, surface);
 }
 
-
-
-/// @return std::vector of Vulkan queues create infos
-std::vector<VkDeviceQueueCreateInfo> App::Impl::GetVulkanQueueCreateInfos(Vulkan_QueueFamilies& qf)
+void App::SetQueues(Queues& queues, const QueueFamilies& qf, VkDevice logical_device)
 {
-  std::vector<VkDeviceQueueCreateInfo> queue_create_infos {};
-  
-  std::set<uint32_t> unique_queue_families { 
-    qf.graphics_family, 
-    qf.present_family 
-  };
-
-  float queue_priority = 1.0f;
-  for (uint32_t queue_family : unique_queue_families)
-  {
-    VkDeviceQueueCreateInfo queue_create_info {};
-    queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queue_create_info.queueFamilyIndex = queue_family;
-    queue_create_info.queueCount = 1;
-    queue_create_info.pQueuePriorities = &queue_priority;
-    queue_create_infos.push_back(queue_create_info);
-  }
-
-  return queue_create_infos;
+  vkGetDeviceQueue(logical_device, qf.graphics_family, 0, &queues.graphics_queue);
+  vkGetDeviceQueue(logical_device, qf.present_family, 0, &queues.presentation_queue);
 }
-
 
 /// WARN: we can check for queue families only after setting Vulkan_Queue_Families::present_families
 /// @return Validness of queue families
-bool App::Impl::CheckQueueFamiliesSupport(const Vulkan_QueueFamilies& qf)
+bool App::CheckQueueFamiliesSupport(const QueueFamilies& qf)
 {
   return qf.supported_families & QUEUE_FAMILIES_BITS::GRAPHICS &&
          qf.supported_families & QUEUE_FAMILIES_BITS::PRESENTATION;
@@ -52,7 +31,7 @@ bool App::Impl::CheckQueueFamiliesSupport(const Vulkan_QueueFamilies& qf)
 
 /// Finds queue families for entered physical device
 /// NOTE: can be called multiple times without performance losses
-void App::Impl::QueryQueueFamilies(Vulkan_QueueFamilies& qf, VkPhysicalDevice dev, VkSurfaceKHR surface)
+void App::QueryQueueFamilies(QueueFamilies& qf, VkPhysicalDevice dev, VkSurfaceKHR surface)
 {
   uint32_t queue_family_count = 0;
   vkGetPhysicalDeviceQueueFamilyProperties(dev, &queue_family_count, nullptr);

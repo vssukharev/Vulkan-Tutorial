@@ -1,5 +1,7 @@
 
-helpers_source = files('files.cpp')
+helpers_source = files(
+  'files.cpp',
+)
 
 project_sources += helpers_source
 

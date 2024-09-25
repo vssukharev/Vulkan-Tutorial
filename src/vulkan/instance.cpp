@@ -1,10 +1,11 @@
 
-#include <implementation.hpp>
 #include <debug.hpp>
 #include <except.hpp>
 
-/// @throw Except::Instance_Failure
-void App::CreateInstance(Vulkan& vk)
+#include <hello-triangle.hpp>
+
+///
+void App::CreateInstance(VkInstance& instance)
 {
   // exception is thrown if requested validation layers are not found
   Dbg::CheckValidationLayersSupport();
@@ -23,7 +24,7 @@ void App::CreateInstance(Vulkan& vk)
   create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
   create_info.pApplicationInfo = &app_info;
   
-  std::vector<const char*> extensions = Impl::GetRequiredVulkanExtensions();
+  std::vector<const char*> extensions = GetRequiredVulkanExtensions();
   create_info.enabledExtensionCount = extensions.size();
   create_info.ppEnabledExtensionNames = extensions.data();
 
@@ -40,13 +41,13 @@ void App::CreateInstance(Vulkan& vk)
   Dbg::PrintRequiredVulkanExtensions();
   // Dbg::PrintAvailableVulkanExtensions();
 
-  if ( vkCreateInstance(&create_info, nullptr, &vk.instance) != VK_SUCCESS )
+  if ( vkCreateInstance(&create_info, nullptr, &instance) != VK_SUCCESS )
     throw Except::Instance_Creation_Failure{__FUNCTION__};
 }
 
 
 ///
-std::vector<const char*> App::Impl::GetRequiredVulkanExtensions() noexcept
+std::vector<const char*> App::GetRequiredVulkanExtensions() noexcept
 {
   uint32_t glfw_extension_count = 0;
   const char** glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);

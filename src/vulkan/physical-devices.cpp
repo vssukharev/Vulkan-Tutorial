@@ -1,47 +1,46 @@
 
-#include "hello-triangle.hpp"
 #include <cstdint>
 #include <map>
 #include <cstring>
 #include <iostream>
 
-#include <implementation.hpp>
+#include <hello-triangle.hpp>
 #include <except.hpp>
 #include <vulkan/vulkan_core.h>
 #include <debug.hpp>
 
 /// Picks physical device (GPU, CPU or other)
 /// @throw Except::Device_Failure
-void App::PickPhysicalDevice(Vulkan& vk)
+void App::PickPhysicalDevice(VkPhysicalDevice& physical_device, VkInstance instance, VkSurfaceKHR surface)
 {
   uint32_t device_count = 0;
-  vkEnumeratePhysicalDevices(vk.instance, &device_count, nullptr);
+  vkEnumeratePhysicalDevices(instance, &device_count, nullptr);
   
   if (device_count == 0)
     throw Except::Unsupported_Physical_Devices{"zero devices found"};
 
-  VkPhysicalDevice devices[device_count];
-  vkEnumeratePhysicalDevices(vk.instance, &device_count, devices);
+  std::vector<VkPhysicalDevice> available_devices(device_count);
+  vkEnumeratePhysicalDevices(instance, &device_count, available_devices.data());
 
   // Choose multimap to set all candidate scores and choose the best one
   std::multimap<int, VkPhysicalDevice> candidates;
 
   // Create temporary queue families variable
-  Vulkan_QueueFamilies tmp_qf {};
-  Impl::Vulkan_SwapChainSupportDetails tmp_sc_details {};
+  QueueFamilies tmp_qf {};
+  SwapChainSupportDetails tmp_sc_details {};
 
   // Loop through devices
-  for (const auto& device : devices) 
+  for (const auto& available_device : available_devices) 
   {
-    Impl::QueryQueueFamilies(tmp_qf, device, vk.surface);
-    Impl::QuerySwapChainSupport(tmp_sc_details, device, vk.surface);
+    QueryQueueFamilies(tmp_qf, available_device, surface);
+    QuerySwapChainSupport(tmp_sc_details, available_device, surface);
 
-    int score = Impl::RatePhysicalDeviceSuitability(device, tmp_qf, tmp_sc_details);
-    candidates.insert(std::make_pair(score, device));
+    int score = RatePhysicalDeviceSuitability(available_device, tmp_qf, tmp_sc_details);
+    candidates.insert(std::make_pair(score, available_device));
   }
 
   if (candidates.rbegin()->first > 0)
-    vk.physical_device = candidates.rbegin()->second;
+    physical_device = candidates.rbegin()->second;
   else
     throw Except::Unsupported_Physical_Devices{"device(s) found but none of them suits"};
 
@@ -52,16 +51,16 @@ void App::PickPhysicalDevice(Vulkan& vk)
 /// Device property priorities: DISCRETE_GPU > INTEGRATED_GPU > VIRTUAL_GPU > CPU > OTHER.
 /// @return - 0 (if device property is invalid or some feature is not supported)
 /// @return - score (otherwise)
-int App::Impl::RatePhysicalDeviceSuitability(VkPhysicalDevice dev, Vulkan_QueueFamilies& qf, Vulkan_SwapChainSupportDetails& sc_details) noexcept
+int App::RatePhysicalDeviceSuitability(VkPhysicalDevice dev, QueueFamilies& qf, SwapChainSupportDetails& sc_details) noexcept
 {
   VkPhysicalDeviceProperties dev_properties;
   VkPhysicalDeviceFeatures dev_features;
   vkGetPhysicalDeviceProperties(dev, &dev_properties);
   vkGetPhysicalDeviceFeatures(dev, &dev_features);
  
-  int score = Impl::CheckQueueFamiliesSupport(qf) && 
-              Impl::CheckPhysicalDeviceExtensionsSupport(dev) &&
-              Impl::CheckSwapChainSupport(sc_details);
+  int score = CheckQueueFamiliesSupport(qf) && 
+              CheckPhysicalDeviceExtensionsSupport(dev) &&
+              CheckSwapChainSupport(sc_details);
 
   // if ( !dev_features.geometryShader ) score = 0; 
 
@@ -80,12 +79,12 @@ int App::Impl::RatePhysicalDeviceSuitability(VkPhysicalDevice dev, Vulkan_QueueF
 
 
 ///
-bool App::Impl::CheckPhysicalDeviceExtensionsSupport(VkPhysicalDevice dev)
+bool App::CheckPhysicalDeviceExtensionsSupport(VkPhysicalDevice dev)
 {
   uint32_t extension_count = 0;
   vkEnumerateDeviceExtensionProperties(dev, nullptr, &extension_count, nullptr);
-  VkExtensionProperties available_extensions[extension_count];
-  vkEnumerateDeviceExtensionProperties(dev, nullptr, &extension_count, available_extensions);
+  std::vector<VkExtensionProperties> available_extensions(extension_count);
+  vkEnumerateDeviceExtensionProperties(dev, nullptr, &extension_count, available_extensions.data());
 
   std::vector<const char*> unavailable_extensions {};
 
@@ -105,7 +104,4 @@ bool App::Impl::CheckPhysicalDeviceExtensionsSupport(VkPhysicalDevice dev)
 
   return unavailable_extensions.size() == 0;
 }
-
-
-
 

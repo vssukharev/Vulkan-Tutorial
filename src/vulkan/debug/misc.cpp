@@ -1,9 +1,9 @@
 
 #include <iostream>
 
-#include <implementation.hpp>
 #include <debug.hpp>
 #include <config.hpp>
+#include <hello-triangle.hpp>
 
 ///
 void App::Dbg::PrintAvailableVulkanExtensions() noexcept

@@ -1,25 +1,33 @@
   
-#include "hello-triangle.hpp"
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
 #include <vector>
 
-#include <implementation.hpp>
+#include <hello-triangle.hpp>
 #include <except.hpp>
 #include <vulkan/vulkan_core.h>
 #include <debug.hpp>
 
 /// Creates swap chain
-void App::CreateSwapChain(Vulkan& vk)
+void App::CreateSwapChain(
+    VkSwapchainKHR& swap_chain,
+    Container<VkImage>& images,
+    VkFormat& image_format,
+    VkExtent2D& image_extent,
+    VkDevice logical_device,
+    VkPhysicalDevice physical_device,
+    VkSurfaceKHR surface,
+    Window window,
+    QueueFamilies& qf)
 {
-  Impl::Vulkan_SwapChainSupportDetails swap_chain_support {};
-  Impl::QuerySwapChainSupport(swap_chain_support, vk.physical_device, vk.surface);
+  SwapChainSupportDetails swap_chain_support {};
+  QuerySwapChainSupport(swap_chain_support, physical_device, surface);
   
-  VkSurfaceFormatKHR surface_format = Impl::ChooseSwapSurfaceFormat(swap_chain_support.formats);
-  VkPresentModeKHR present_mode = Impl::ChooseSwapPresentMode(swap_chain_support.present_modes);
-  VkExtent2D extent = Impl::ChooseSwapExtent(swap_chain_support.capabilities, vk.window);
+  VkSurfaceFormatKHR surface_format = ChooseSwapSurfaceFormat(swap_chain_support.formats);
+  VkPresentModeKHR present_mode = ChooseSwapPresentMode(swap_chain_support.present_modes);
+  VkExtent2D extent = ChooseSwapExtent(swap_chain_support.capabilities, window);
 
   // We add 1 to minimal image count to avoid waiting for driver to render one more image
   uint32_t image_count = swap_chain_support.capabilities.minImageCount + 1;
@@ -32,7 +40,7 @@ void App::CreateSwapChain(Vulkan& vk)
   // Start create info ... again :_:
   VkSwapchainCreateInfoKHR create_info {};
   create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-  create_info.surface = vk.surface;
+  create_info.surface = surface;
   create_info.minImageCount = image_count; 
   create_info.imageFormat = surface_format.format;
   create_info.imageColorSpace = surface_format.colorSpace;
@@ -40,13 +48,13 @@ void App::CreateSwapChain(Vulkan& vk)
   create_info.imageArrayLayers = 1; // specifies the amount of layers each image consists of
   create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
   
-  SetQueueFamilies(vk);
+  SetQueueFamilies(qf, physical_device, surface);
   uint32_t queue_family_indices[] = { 
-    vk.queue_families.graphics_family, 
-    vk.queue_families.present_family
+    qf.graphics_family, 
+    qf.present_family
   };
 
-  if ( vk.queue_families.graphics_family != vk.queue_families.present_family ) {
+  if ( qf.graphics_family != qf.present_family ) {
     // It is required for VK_SHARING_MODE_CONCURRENT to specify shared queue families
     create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
     create_info.queueFamilyIndexCount = 2;
@@ -65,29 +73,29 @@ void App::CreateSwapChain(Vulkan& vk)
   create_info.clipped = VK_TRUE; // enable clipping if window is back to other windows
   create_info.oldSwapchain = VK_NULL_HANDLE;
 
-  if ( vkCreateSwapchainKHR(vk.device, &create_info, nullptr, &vk.swap_chain.handle) != VK_SUCCESS )
+  if ( vkCreateSwapchainKHR(logical_device, &create_info, nullptr, &swap_chain) != VK_SUCCESS )
     throw Except::Swap_Chain_Creation_Failure{__FUNCTION__};
   Dbg::PrintFunctionInfo(__FUNCTION__, "Created swapchain");
 
   // Retrieve image handles
-  vkGetSwapchainImagesKHR(vk.device, vk.swap_chain.handle, &image_count, nullptr);
-  vk.swap_chain.images.resize(image_count);
-  vkGetSwapchainImagesKHR(vk.device, vk.swap_chain.handle, &image_count, vk.swap_chain.images.data());
+  vkGetSwapchainImagesKHR(logical_device, swap_chain, &image_count, nullptr);
+  images.resize(image_count);
+  vkGetSwapchainImagesKHR(logical_device, swap_chain, &image_count, images.data());
 
-  vk.swap_chain.image_format = surface_format.format;
-  vk.swap_chain.extent = extent;
+  image_format = surface_format.format;
+  image_extent = extent;
 }
 
 
 /// Checks whether swapchains are supported based on passed details
-bool App::Impl::CheckSwapChainSupport(const Vulkan_SwapChainSupportDetails& details)
+bool App::CheckSwapChainSupport(const SwapChainSupportDetails& details)
 {
   return !details.formats.empty() && !details.present_modes.empty();
 }
 
 
 /// Query for swapchain support of selected device and surface
-void App::Impl::QuerySwapChainSupport(Vulkan_SwapChainSupportDetails& details, VkPhysicalDevice dev, VkSurfaceKHR surface)
+void App::QuerySwapChainSupport(SwapChainSupportDetails& details, VkPhysicalDevice dev, VkSurfaceKHR surface)
 {
   vkGetPhysicalDeviceSurfaceCapabilitiesKHR(dev, surface, &details.capabilities);
   
@@ -110,7 +118,7 @@ void App::Impl::QuerySwapChainSupport(Vulkan_SwapChainSupportDetails& details, V
 
 
 /// @return the most appropriate format
-VkSurfaceFormatKHR App::Impl::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& available_formats)
+VkSurfaceFormatKHR App::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& available_formats)
 {
   std::size_t best_candidate_index = 0;
   int best_score = 0;
@@ -118,7 +126,7 @@ VkSurfaceFormatKHR App::Impl::ChooseSwapSurfaceFormat(const std::vector<VkSurfac
   for (std::size_t i = 0; i != available_formats.size(); ++i) {
     const auto& available_format = available_formats[i];
 
-    int current_score = Impl::RateSwapSurfaceFormat(available_format);
+    int current_score = RateSwapSurfaceFormat(available_format);
     if ( current_score > best_score ) {
       best_score = current_score;
       best_candidate_index = i;
@@ -131,7 +139,7 @@ VkSurfaceFormatKHR App::Impl::ChooseSwapSurfaceFormat(const std::vector<VkSurfac
 
 
 /// @return score of passed surface format
-int App::Impl::RateSwapSurfaceFormat(VkSurfaceFormatKHR sf_format)
+int App::RateSwapSurfaceFormat(VkSurfaceFormatKHR sf_format)
 {
   int score = 0;
 
@@ -144,7 +152,7 @@ int App::Impl::RateSwapSurfaceFormat(VkSurfaceFormatKHR sf_format)
 
 
 ///
-VkPresentModeKHR App::Impl::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& present_modes)
+VkPresentModeKHR App::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& present_modes)
 {
   std::size_t best_candidate_index = 0;
   int best_score = 0;
@@ -152,7 +160,7 @@ VkPresentModeKHR App::Impl::ChooseSwapPresentMode(const std::vector<VkPresentMod
   for (std::size_t i = 0; i != present_modes.size(); ++i) {
     const VkPresentModeKHR& present_mode = present_modes[i];
 
-    int current_score = Impl::RateSwapPresentMode(present_mode);
+    int current_score = RateSwapPresentMode(present_mode);
     if ( current_score > best_score ) {
       best_score = current_score;
       best_candidate_index = i;
@@ -167,7 +175,7 @@ VkPresentModeKHR App::Impl::ChooseSwapPresentMode(const std::vector<VkPresentMod
 
 
 ///
-int App::Impl::RateSwapPresentMode(VkPresentModeKHR present_mode)
+int App::RateSwapPresentMode(VkPresentModeKHR present_mode)
 {
   int score = 0;
   
@@ -184,7 +192,7 @@ int App::Impl::RateSwapPresentMode(VkPresentModeKHR present_mode)
 /// Chooses swap extent (resolution of images inside swap-chain)
 /// @return extent of window framebuffer (if capabilities.currentExtent has maximum values of uint32_t)
 /// @return capabilities.currentExtent (otherwise)
-VkExtent2D App::Impl::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* win)
+VkExtent2D App::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* win)
 {
   if ( capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max() ) {
     return capabilities.currentExtent;

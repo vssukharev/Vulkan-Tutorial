@@ -1,6 +1,8 @@
   
 #include <cstdint>
 
+#pragma once
+
 namespace App {
   // --- Inner structs
   enum class QUEUE_FAMILIES_BITS : uint32_t

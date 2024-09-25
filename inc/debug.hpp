@@ -1,8 +1,10 @@
 
+#pragma once
+
 #include "config.hpp"
 #include <string>
 
-#include <implementation.hpp>
+#include <hello-triangle.hpp>
 #include <iostream>
 
 // NOTE: all functions inside Dbg namespace do nothing if NDEBUG is defined

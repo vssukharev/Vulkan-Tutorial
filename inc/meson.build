@@ -5,7 +5,6 @@ project_header_files += files(
   'decl.hpp',
   'except.hpp',
   'hello-triangle.hpp',
-  'implementation.hpp'
 )
 
 subdir('helpers')

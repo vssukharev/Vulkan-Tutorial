@@ -1,18 +1,11 @@
 
 #pragma once
 
-#include "hello-triangle.hpp"
-#include <concepts>
-#include <locale>
-#include <string>
-#include <vector>
 #include <iostream>
 
 #include <config.hpp>
 
-#define EXCEPT_NAME_RET \
-  inline static const char*
-
+#define EXCEPT_NAME_RET inline static const char*
 
 
 // ------ Exception classes ------
