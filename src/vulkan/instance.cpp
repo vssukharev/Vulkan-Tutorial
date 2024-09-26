@@ -5,7 +5,7 @@
 #include <hello-triangle.hpp>
 
 ///
-void App::CreateInstance(VkInstance& instance)
+void App::CreateInstance(VkInstance& rInstance)
 {
   // exception is thrown if requested validation layers are not found
   Dbg::CheckValidationLayersSupport();
@@ -41,7 +41,7 @@ void App::CreateInstance(VkInstance& instance)
   Dbg::PrintRequiredVulkanExtensions();
   // Dbg::PrintAvailableVulkanExtensions();
 
-  if ( vkCreateInstance(&create_info, nullptr, &instance) != VK_SUCCESS )
+  if ( vkCreateInstance(&create_info, nullptr, &rInstance) != VK_SUCCESS )
     throw Except::Instance_Creation_Failure{__FUNCTION__};
 }
 

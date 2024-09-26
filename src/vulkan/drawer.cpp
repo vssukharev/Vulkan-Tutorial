@@ -44,11 +44,12 @@ void App::DrawFrame(
   // Acquire image from GPU and set 'image_available_semaphore' as submit one
   vkAcquireNextImageKHR(logicalDevice, swapChain, UINT64_MAX, sync.image_available_semaphores[rLastFrame], VK_NULL_HANDLE, &image_index);
 
+
   // Dbg::PrintFunctionInfo(__FUNCTION__, "vkAcquireNextImageKHR result - ", std::boolalpha, res); 
   
 
   vkResetCommandBuffer(rCommandBuffers[rLastFrame], 0);
-  RecordCommandBuffer(rCommandBuffers[rLastFrame], framebuffers[rLastFrame], imageExtent, renderPass, graphicsPipeline);
+  RecordCommandBuffer(rCommandBuffers[rLastFrame], framebuffers[image_index], imageExtent, renderPass, graphicsPipeline);
   
   VkSubmitInfo submit_info {};
   submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -90,7 +91,6 @@ void App::DrawFrame(
 
   // TODO: check for errors
   vkQueuePresentKHR(queues.presentation_queue, &present_info);
-
 
   // Dbg::PrintFunctionInfo(__FUNCTION__, "vkQueuePresentKHR result - ", std::boolalpha, res); 
   rLastFrame = (rLastFrame + 1) % MAX_FRAMES_IN_FLIGHT;

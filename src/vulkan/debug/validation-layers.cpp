@@ -1,4 +1,5 @@
 
+#include "config.hpp"
 #include <vector>
 #include <cstring>
 #include <iostream>
@@ -6,6 +7,7 @@
 #include <hello-triangle.hpp>
 #include <except.hpp>
 #include <debug.hpp>
+#include <vulkan/vulkan_core.h>
 
 
 /// Checks for validation layers availability
@@ -45,14 +47,14 @@ void App::Dbg::CheckValidationLayersSupport()
 
 
 /// @throw Except::Instance_Failure
-void App::Dbg::CreateDebugMessenger(Vulkan& vk)
+void App::Dbg::CreateDebugMessenger(VkDebugUtilsMessengerEXT& rDebugMessenger, VkInstance instance)
 {
 #ifndef NDEBUG
   
   auto create_info = Impl::GenerateDebugMessengerCreateInfo();
 
   // We are allowed to use vk.dbg.messenger as we are inside '#ifndef NDEBUG' block
-  if (vkCreateDebugUtilsMessengerEXT(vk.instance, &create_info, nullptr, &vk.dbg.messenger) != VK_SUCCESS)
+  if (vkCreateDebugUtilsMessengerEXT(instance, &create_info, nullptr, &rDebugMessenger) != VK_SUCCESS)
     throw Except::Debug_Messenger_Creation_Failure{__FUNCTION__};
   Dbg::PrintFunctionInfo(__FUNCTION__, "Created debug messenger");
 
@@ -62,10 +64,10 @@ void App::Dbg::CreateDebugMessenger(Vulkan& vk)
 
 
 /// Destroys debug messenger
-void App::Dbg::DestroyDebugMessenger(Vulkan& vk) noexcept
+void App::Dbg::DestroyDebugMessenger(VkDebugUtilsMessengerEXT& rDebugMessenger, VkInstance instance) noexcept
 {
 #ifndef NDEBUG
-  vkDestroyDebugUtilsMessengerEXT(vk.instance, vk.dbg.messenger, nullptr);
+  vkDestroyDebugUtilsMessengerEXT(instance, rDebugMessenger, nullptr);
 #endif // !NDEBUG
 }
 
@@ -80,9 +82,9 @@ std::string App::Dbg::Impl::GenerateVulkanLogPrefix(
 
 #ifndef NDEBUG
   if ( message_severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT ) res += VLK_VERB;
-  if ( message_severity &  VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT ) res += VLK_INFO;
-  if ( message_severity &  VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT ) res += VLK_WARN;
-  if ( message_severity &  VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT ) res += VLK_ERRO;
+  if ( message_severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT ) res += VLK_INFO;
+  if ( message_severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT ) res += VLK_WARN;
+  if ( message_severity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT ) res += VLK_ERRO;
   res += ' ';
   if ( message_type & VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT ) res += VLK_LAYERS_GENERAL;
   if ( message_type & VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT ) res += VLK_LAYERS_VALIDATION;
@@ -103,7 +105,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL App::Dbg::Impl::VulkanCallback(
       void* user_data)
 {
 #ifndef NDEBUG
-  std::cerr << GenerateVulkanLogPrefix(message_severity, message_type) << callback_data->pMessage << '\n';
+  std::cout << GenerateVulkanLogPrefix(message_severity, message_type) << callback_data->pMessage << '\n';
 #endif // !NDEBUG
 
   return VK_FALSE;
@@ -120,7 +122,7 @@ VkDebugUtilsMessengerCreateInfoEXT App::Dbg::Impl::GenerateDebugMessengerCreateI
   create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
   create_info.messageSeverity =
     VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | 
-    VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | 
+    // VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT | 
     VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | 
     VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
   create_info.messageType =

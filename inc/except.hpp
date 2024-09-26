@@ -22,7 +22,7 @@ namespace App::Except {
     Base(const char* message = "")
     {
     #ifndef NDEBUG
-      std::cerr << Dbg::VLK_ERRO 
+      std::cout << Dbg::VLK_ERRO 
         << " : Exception '" << COL_ORANGE << name() << COL_NO << "' thrown with the message " 
         << "\"" << COL_SALAD << message << COL_NO << "\"\n";
     #endif // !NDEBUG

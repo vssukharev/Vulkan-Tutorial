@@ -17,21 +17,21 @@ void App::InitGLFW()
 }
 
 ///
-void App::CreateWindow(Window& window)
+void App::CreateWindow(Window& rWindow)
 {
   // Prohibit GLFW creating OpenGL instance
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); 
   // Disable window resizing (for now) due to complexity of its handling
   glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); 
-  window = glfwCreateWindow(800, 600, "Vulkan", nullptr, nullptr);
+  rWindow = glfwCreateWindow(800, 600, "Vulkan", nullptr, nullptr);
 
   Dbg::PrintFunctionInfo(__FUNCTION__, "GLFW window created");
 }
 
 ///
-void App::CreateSurface(VkSurfaceKHR& surface, Window window, VkInstance instance)
+void App::CreateSurface(VkSurfaceKHR& rSurface, Window window, VkInstance instance)
 {
-  if ( glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS )
+  if ( glfwCreateWindowSurface(instance, window, nullptr, &rSurface) != VK_SUCCESS )
     throw Except::Window_Surface_Creation_Failure{__PRETTY_FUNCTION__};
   Dbg::PrintFunctionInfo(__FUNCTION__, "Window surface created");
 }

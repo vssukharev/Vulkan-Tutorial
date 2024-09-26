@@ -26,12 +26,11 @@ void App::CreateRenderPass(
   // storeOp - is what to do with data after rendering
   // VK_ATTACHMENT_STORE_OP_STORE - rendered contents will be stored in memory and can be read later
   // VK_ATTACHMENT_STORE_OP_DONT_CARE - contents of the framebuffer will be undefined after rendering operation
-  // initialLayout or finalLayout
+  // initialLayout - image layout before rendering
+  // finalLayout - image layout when render pass finishes
   // VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL - images are used as color attachments
   // VK_IMAGE_LAYOUT_PRESENT_SRC_KHR - images are presented in the swap chain
   // VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL - images are used as destination for a memory copy operation
-  // initialLayout - image layout before rendering
-  // finalLayout - image layout when render pass finishes
 
 
   VkAttachmentReference color_attachment_ref {};
@@ -56,7 +55,7 @@ void App::CreateRenderPass(
   dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
   dependency.srcAccessMask = 0;
   dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-  dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+  dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
 
   VkRenderPassCreateInfo render_pass_info {};
   render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;

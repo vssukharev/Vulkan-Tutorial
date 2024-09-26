@@ -15,7 +15,7 @@ void App::CreateFramebuffers(
     VkRenderPass render_pass,
     VkExtent2D framebuffer_extent)
 {
-  framebuffers.reallocate(image_views.size());
+  framebuffers.resize(image_views.size());
 
   for (std::size_t i = 0; i != image_views.size(); ++i) {
     VkImageView attachments[] = {

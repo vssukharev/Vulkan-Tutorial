@@ -3,7 +3,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <limits>
-#include <vector>
 
 #include <hello-triangle.hpp>
 #include <except.hpp>
@@ -13,14 +12,14 @@
 /// Creates swap chain
 void App::CreateSwapChain(
     VkSwapchainKHR& swap_chain,
-    Container<VkImage>& images,
+    Images& images,
     VkFormat& image_format,
     VkExtent2D& image_extent,
     VkDevice logical_device,
     VkPhysicalDevice physical_device,
     VkSurfaceKHR surface,
     Window window,
-    QueueFamilies& qf)
+    const QueueFamilies& qf)
 {
   SwapChainSupportDetails swap_chain_support {};
   QuerySwapChainSupport(swap_chain_support, physical_device, surface);
@@ -48,14 +47,12 @@ void App::CreateSwapChain(
   create_info.imageArrayLayers = 1; // specifies the amount of layers each image consists of
   create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
   
-  SetQueueFamilies(qf, physical_device, surface);
   uint32_t queue_family_indices[] = { 
     qf.graphics_family, 
     qf.present_family
   };
 
-  if ( qf.graphics_family != qf.present_family ) {
-    // It is required for VK_SHARING_MODE_CONCURRENT to specify shared queue families
+  if ( qf.graphics_family != qf.present_family ) {    // It is required for VK_SHARING_MODE_CONCURRENT to specify shared queue families
     create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
     create_info.queueFamilyIndexCount = 2;
     create_info.pQueueFamilyIndices = queue_family_indices;
@@ -79,7 +76,7 @@ void App::CreateSwapChain(
 
   // Retrieve image handles
   vkGetSwapchainImagesKHR(logical_device, swap_chain, &image_count, nullptr);
-  images.reallocate(image_count);
+  images.resize(image_count);
   vkGetSwapchainImagesKHR(logical_device, swap_chain, &image_count, images.data());
 
   image_format = surface_format.format;
@@ -103,7 +100,7 @@ void App::QuerySwapChainSupport(SwapChainSupportDetails& details, VkPhysicalDevi
   vkGetPhysicalDeviceSurfaceFormatsKHR(dev, surface, &format_count, nullptr);
   if (format_count != 0) 
   {
-    details.formats.reallocate(format_count);
+    details.formats.resize(format_count);
     vkGetPhysicalDeviceSurfaceFormatsKHR(dev, surface, &format_count, details.formats.data());
   }
 
@@ -111,7 +108,7 @@ void App::QuerySwapChainSupport(SwapChainSupportDetails& details, VkPhysicalDevi
   vkGetPhysicalDeviceSurfacePresentModesKHR(dev, surface, &present_mode_count, nullptr);
   if (present_mode_count != 0) 
   {
-    details.present_modes.reallocate(present_mode_count);
+    details.present_modes.resize(present_mode_count);
     vkGetPhysicalDeviceSurfacePresentModesKHR(dev, surface, &format_count, details.present_modes.data());
   }
 }

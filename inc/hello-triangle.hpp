@@ -68,11 +68,9 @@ namespace App {
   };
 
   // --- Debug struct
-  struct Debug 
+  struct VulkanDebug
   {
-#ifndef NDEBUG
     VkDebugUtilsMessengerEXT messenger;
-#endif // !NDEBUG
   };
 
   // --- Main struct
@@ -84,7 +82,7 @@ namespace App {
     Queues queues;
     QueueFamilies queue_families;
     SyncObjects sync;
-    Container<VkCommandBuffer> command_buffers;
+    CommandBuffers command_buffers;
     uint32_t current_frame;
     VkSwapchainKHR swap_chain;
     VkFormat image_format;
@@ -99,8 +97,7 @@ namespace App {
     VkCommandPool command_pool;
     GLFWwindow* window;
 
-    // TODO: get rid of debug inside Vulkan class
-    Debug dbg;
+    VulkanDebug dbg;
   };
   
   // ------------------------------
@@ -121,133 +118,135 @@ namespace App {
   
   // ------ General ------
   void Init(
-      Data&);
+      Data& rData);
 
   void MainLoop(
-      Data&);
+      Data& rData);
 
   void Cleanup(
-      Data&);
+      Data& rData);
   // ---------------------
 
   // ------ Meta ------
   void Init(
-      Meta&);
+      Meta& rMeta);
   // ------------------
 
   // ------ Vulkan ------
   void Init(
-      Vulkan&, 
-      Meta&);
+      Vulkan&       rVk, 
+      VulkanDebug&  rDbg, 
+      const Meta&   meta);
   
   void InitGLFW();
 
   void Cleanup(
-      Vulkan&) 
+      Vulkan&      rVk,
+      VulkanDebug& rVkDbg) 
     noexcept;
   
   void CreateWindow(
-      Window&);
+      Window& rWindow);
 
   void CreateInstance(
-      VkInstance&);
+      VkInstance& rInstance);
 
   void CreateSurface(
-      VkSurfaceKHR&, 
-      Window, 
-      VkInstance);
+      VkSurfaceKHR& rSurface, 
+      Window        window, 
+      VkInstance    instance);
 
   void PickPhysicalDevice(
-      VkPhysicalDevice&, 
-      VkInstance, 
-      VkSurfaceKHR);
+      VkPhysicalDevice& rPhysicalDevice, 
+      VkInstance        instance,
+      VkSurfaceKHR      surface);
 
   void SetQueueFamilies(
-      QueueFamilies&, 
-      VkPhysicalDevice, 
-      VkSurfaceKHR);
+      QueueFamilies&    rQueueFamilies,
+      VkPhysicalDevice  physicalDevice,
+      VkSurfaceKHR      surface);
 
   void CreateLogicalDevice(    
-      VkDevice& device, 
-      QueueFamilies& qf,
-      VkPhysicalDevice physical_device, 
-      VkSurfaceKHR surface);
+      VkDevice&        rLogicalDevice, 
+      QueueFamilies&   rQueueFamilies,
+      VkPhysicalDevice physicalDevice, 
+      VkSurfaceKHR     surface);
 
   void SetQueues(
-      Queues& queues, 
-      const QueueFamilies& qf, 
-      VkDevice logical_device);
+      Queues&              rQueues, 
+      const QueueFamilies& queueFamilies, 
+      VkDevice             logicalDevice);
 
   void CreateSwapChain(
-      VkSwapchainKHR& swap_chain,
-      Container<VkImage>& images,
-      VkFormat& image_format,
-      VkExtent2D& image_extent,
-      VkDevice logical_device,
-      VkPhysicalDevice physical_device,
-      VkSurfaceKHR surface,
-      Window window,
-      QueueFamilies& qf);
+      VkSwapchainKHR&       rSwapChain,
+      Images&               rImages,
+      VkFormat&             rImageFormat,
+      VkExtent2D&           rImageExtent,
+      VkDevice              logicalDevice,
+      VkPhysicalDevice      physicalDevice,
+      VkSurfaceKHR          surface,
+      Window                window,
+      const QueueFamilies&  queueFamilies);
 
   void CreateImageViews(
-      Container<VkImageView>& image_views, 
-      const Container<VkImage>& images, 
-      VkFormat image_format,
-      VkDevice dev);
+      ImageViews&   rImageViews, 
+      const Images& images, 
+      VkFormat      imageFormat,
+      VkDevice      logicalDevice);
 
   void CreateRenderPass(
-      VkRenderPass& render_pass,
-      VkFormat image_format,
-      VkDevice logical_device);
+      VkRenderPass& rRenderPass,
+      VkFormat      imageFormat,
+      VkDevice      logicalDevice);
   
   void CreateGraphicsPipeline(
-      VkPipeline& graphics_pipeline,
-      VkPipelineLayout& pipeline_layout,
-      VkDevice logical_device,
-      VkRenderPass render_pass,
-      const std::filesystem::path& binary_dir);
+      VkPipeline&                  rGraphicsPipeline,
+      VkPipelineLayout&            rPipelineLayout,
+      VkDevice                     logicalDevice,
+      VkRenderPass                 renderPass,
+      const std::filesystem::path& mainBinaryDir);
   
   void CreateFramebuffers(
-      Container<VkFramebuffer>& framebuffers,
-      const Container<VkImageView>& image_views,
-      VkDevice logical_device, 
-      VkRenderPass render_pass,
-      VkExtent2D framebuffer_extent);
+      Framebuffers&     rFramebuffers,
+      const ImageViews& imageViews,
+      VkDevice          logicalDevice, 
+      VkRenderPass      renderPass,
+      VkExtent2D        framebufferExtent);
 
   void CreateCommandPool(
-    VkCommandPool& command_pool,
-    const QueueFamilies& qf,
-    VkDevice logical_device);
+      VkCommandPool&        rCommandPool,
+      const QueueFamilies&  queueFamilies,
+      VkDevice              logicalDevice);
 
   void CreateCommandBuffers(
-      Container<VkCommandBuffer>& command_buffers,
-      VkDevice logical_device,
-      VkCommandPool command_pool);
+      CommandBuffers& rCommandBuffers,
+      VkDevice        logicalDevice,
+      VkCommandPool   commandPool);
 
   void CreateSyncObjects(
-      SyncObjects& sync,
-      VkDevice logical_device);
+      SyncObjects&  rSyncObjects,
+      VkDevice      logicalDevice);
 
   void RecordCommandBuffer(
-      VkCommandBuffer& command_buffer,
-      VkFramebuffer framebuffer,
-      VkExtent2D image_extent,
-      VkRenderPass render_pass,
-      VkPipeline graphics_pipeline);
+      VkCommandBuffer&  rCommandBuffer,
+      VkFramebuffer     framebuffer,
+      VkExtent2D        imageExtent,
+      VkRenderPass      renderPass,
+      VkPipeline        graphicsPipeline);
 
   void DrawFrame(
-      uint32_t& last_frame,
-      Container<VkCommandBuffer>& command_buffers,
-      const SyncObjects& sync,
-      const Queues& queues,
-      const Container<VkFramebuffer>& framebuffers,
-      VkDevice logical_device,
-      VkSwapchainKHR swap_chain,
-      VkExtent2D image_extent,
-      VkRenderPass render_pass,
-      VkPipeline graphics_pipeline);
+      uint32_t&           rLastFrame,
+      CommandBuffers&     rCommandBuffers,
+      const SyncObjects&  syncObjects,
+      const Queues&       queues,
+      const Framebuffers& framebuffers,
+      VkDevice            logicalDevice,
+      VkSwapchainKHR      swapchain,
+      VkExtent2D          imageExtent,
+      VkRenderPass        renderPass,
+      VkPipeline          graphicsPipeline);
 
-  void DrawFrame(Data&);
+  void DrawFrame(Data& rData);
     // ------ Vulkan ------
   // --- Helper structs
   

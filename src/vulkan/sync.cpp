@@ -10,9 +10,9 @@ void App::CreateSyncObjects(
     SyncObjects& sync,
     VkDevice logical_device)
 {
-  sync.image_available_semaphores.reallocate(MAX_FRAMES_IN_FLIGHT);
-  sync.render_finished_semaphores.reallocate(MAX_FRAMES_IN_FLIGHT);
-  sync.in_flight_fences.reallocate(MAX_FRAMES_IN_FLIGHT);
+  sync.image_available_semaphores.resize(MAX_FRAMES_IN_FLIGHT);
+  sync.render_finished_semaphores.resize(MAX_FRAMES_IN_FLIGHT);
+  sync.in_flight_fences.resize(MAX_FRAMES_IN_FLIGHT);
 
   VkSemaphoreCreateInfo semaphore_info {};
   semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;

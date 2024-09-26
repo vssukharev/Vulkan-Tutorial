@@ -43,7 +43,7 @@ namespace App::Dbg {
   const std::vector<const char*> gl_validation_layers {
 #ifndef NDEBUG
     "VK_LAYER_KHRONOS_validation",
-    // "VK_LAYER_LUNARG_api_dump"
+    // "VK_LAYER_LUNARG_api_dump",
 #endif // !NDEBUG
   };
 }

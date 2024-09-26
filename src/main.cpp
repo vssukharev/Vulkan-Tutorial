@@ -10,7 +10,7 @@
 void App::Init(Data& data)
 {
   Init(data.meta);
-  Init(data.vulkan, data.meta);
+  Init(data.vulkan, data.vulkan.dbg, data.meta);
 }
 
 
@@ -30,7 +30,7 @@ void App::MainLoop(Data& data)
 /// Collects garbafe left after application
 void App::Cleanup(Data& data)
 {
-  Cleanup(data.vulkan);
+  Cleanup(data.vulkan, data.vulkan.dbg);
 }
 
 
@@ -39,7 +39,7 @@ int main() {
   App::Data data {};
 
   Init(data); 
-  // MainLoop(data);
+  MainLoop(data);
   Cleanup(data);
 
   return EXIT_SUCCESS;

@@ -15,16 +15,23 @@ namespace App::Dbg {
   void PrintRequiredVulkanExtensions() noexcept;
   void PrintAvailableVulkanExtensions() noexcept;
   void CheckValidationLayersSupport();
-  void CreateDebugMessenger(Vulkan& vk);
-  void DestroyDebugMessenger(Vulkan& vk) noexcept;
+  
+  void CreateDebugMessenger(
+      VkDebugUtilsMessengerEXT& rDebugMessenger, 
+      VkInstance instance);
+
+  void DestroyDebugMessenger(
+      VkDebugUtilsMessengerEXT& rDebugMessenger, 
+      VkInstance instance) noexcept;
+
 
   template <typename... Types>
   void PrintFunctionInfo(const char* func_name, const Types&... args) noexcept
   {
 #ifndef NDEBUG
-    std::cerr << Dbg::VLK_VERB << " " << COL_ORANGE << func_name << COL_NO << " : ";
-    ( (std::cerr << args), ...  );
-    std::cerr << '\n';
+    std::cout << Dbg::VLK_VERB << " " << COL_ORANGE << func_name << COL_NO << " : ";
+    ( (std::cout << args), ...  );
+    std::cout << '\n';
 #endif // !NDEBUG
   }
   

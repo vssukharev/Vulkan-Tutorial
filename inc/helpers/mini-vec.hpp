@@ -81,7 +81,7 @@ namespace App {
 
       mini_vec(std::size_t vec_sz)
       {
-        reallocate(vec_sz);
+        resize(vec_sz);
       }
 
       mini_vec(std::initializer_list<T> il)
@@ -127,7 +127,7 @@ namespace App {
         sz = 0;
       }
 
-      void reallocate(std::size_t newSize)
+      void resize(std::size_t newSize)
       {
         T* new_elem = new T[newSize];
 
@@ -142,7 +142,7 @@ namespace App {
       void expand(std::size_t count)
       {
         std::size_t new_size = sz + count;
-        reallocate(new_size);
+        resize(new_size);
       }
   };
 }
