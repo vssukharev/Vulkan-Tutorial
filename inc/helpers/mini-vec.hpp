@@ -121,7 +121,7 @@ namespace App {
       
       bool empty() const { return sz == 0; }
       
-      void deallocate()
+      void clear()
       {
         delete[] elem;
         sz = 0;

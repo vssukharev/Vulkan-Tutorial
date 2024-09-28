@@ -155,6 +155,16 @@ namespace App::Except {
   {
     EXCEPT_NAME_RET name() { return "Queue_Submittion_Failure"; } 
   };
+
+  struct Image_Acquiring_Failure : Acquiring_Failure<Image_Acquiring_Failure>
+  {
+    EXCEPT_NAME_RET name() { return "Image_Acquiring_Failure"; }
+  };
+
+  struct Image_Presentation_Failure : Acquiring_Failure<Image_Presentation_Failure>
+  {
+    EXCEPT_NAME_RET name() { return "Image_Presentation_Failure"; }
+  };
   // -------------------------
 
   // --- Missing item ---

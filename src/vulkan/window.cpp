@@ -1,4 +1,5 @@
 
+#include "decl.hpp"
 #include "hello-triangle.hpp"
 #include <GLFW/glfw3.h>
 #include <hello-triangle.hpp>
@@ -8,7 +9,6 @@
 #include <debug.hpp>
 #include <vulkan/vulkan_core.h>
 
-
 ///
 void App::InitGLFW()
 {
@@ -17,14 +17,16 @@ void App::InitGLFW()
 }
 
 ///
-void App::CreateWindow(Window& rWindow)
+void App::CreateWindow(
+    Window&         rWindow,
+    SWAPCHAIN_STATE_BITS_T& pSwapChainState)
 {
-  // Prohibit GLFW creating OpenGL instance
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); 
-  // Disable window resizing (for now) due to complexity of its handling
-  glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); 
   rWindow = glfwCreateWindow(800, 600, "Vulkan", nullptr, nullptr);
-
+  
+  glfwSetWindowUserPointer(rWindow, &pSwapChainState);
+  glfwSetFramebufferSizeCallback(rWindow, FramebufferResizeCallback);
+  
   Dbg::PrintFunctionInfo(__FUNCTION__, "GLFW window created");
 }
 
@@ -35,4 +37,5 @@ void App::CreateSurface(VkSurfaceKHR& rSurface, Window window, VkInstance instan
     throw Except::Window_Surface_Creation_Failure{__PRETTY_FUNCTION__};
   Dbg::PrintFunctionInfo(__FUNCTION__, "Window surface created");
 }
+
 

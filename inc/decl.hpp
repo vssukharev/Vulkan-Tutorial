@@ -1,19 +1,32 @@
   
 #include <cstdint>
 #include <helpers/mini-vec.hpp>
+#include <type_traits>
 #include <vector>
 
 #pragma once
 
 namespace App {
-  // --- Inner structs
-  enum class QUEUE_FAMILIES_BITS : uint32_t
+  // --- Enums
+  enum QUEUE_FAMILIES_BITS : uint8_t
   {
-    GRAPHICS = 0x01,
-    PRESENTATION = 0x02,
+    QUEUE_FAMILY_GRAPHICS     = 0x1,
+    QUEUE_FAMILY_PRESENTATION = 0x2,
   };
+  using QUEUE_FAMILIES_BITS_T = std::underlying_type_t<QUEUE_FAMILIES_BITS>;
+
+
+  enum SWAPCHAIN_STATE_BITS : uint8_t
+  {
+    SWAPCHAIN_STATE_FRAMEBUFFER_RESIZED = 0x1,
+  };
+  using SWAPCHAIN_STATE_BITS_T = std::underlying_type_t<SWAPCHAIN_STATE_BITS>;
+
+  // --- Aliases
+  template <typename T>
+  using NoCapContainer = mini_vec<T>;
 
   template <typename T>
-  using Container = mini_vec<T>;
+  using CapContainer = std::vector<T>;
 }
 

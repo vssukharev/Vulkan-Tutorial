@@ -24,8 +24,8 @@ void App::SetQueues(Queues& queues, const QueueFamilies& qf, VkDevice logical_de
 /// @return Validness of queue families
 bool App::CheckQueueFamiliesSupport(const QueueFamilies& qf)
 {
-  return qf.supported_families & QUEUE_FAMILIES_BITS::GRAPHICS &&
-         qf.supported_families & QUEUE_FAMILIES_BITS::PRESENTATION;
+  return qf.supported_families & QUEUE_FAMILY_GRAPHICS &&
+         qf.supported_families & QUEUE_FAMILY_PRESENTATION;
 }
 
 
@@ -42,14 +42,14 @@ void App::QueryQueueFamilies(QueueFamilies& qf, VkPhysicalDevice dev, VkSurfaceK
   for (const auto& queue_family : queue_families)
   {
     if (queue_family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-      qf.supported_families |= QUEUE_FAMILIES_BITS::GRAPHICS;
+      qf.supported_families |= QUEUE_FAMILIES_BITS::QUEUE_FAMILY_GRAPHICS;
       qf.graphics_family = family_index;
     }
     
     VkBool32 present_support = false;
     vkGetPhysicalDeviceSurfaceSupportKHR(dev, family_index, surface, &present_support);
     if (present_support) {
-      qf.supported_families |= QUEUE_FAMILIES_BITS::PRESENTATION;
+      qf.supported_families |= QUEUE_FAMILIES_BITS::QUEUE_FAMILY_PRESENTATION;
       qf.present_family = family_index;
     }
 

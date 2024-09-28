@@ -13,55 +13,84 @@
 void App::Init(Vulkan& rVk, VulkanDebug& rVkDbg, const Meta& meta)
 {
   InitGLFW();
-  CreateWindow(rVk.window);
-  CreateInstance(rVk.instance);
-  Dbg::CreateDebugMessenger(rVkDbg.messenger, rVk.instance);
-  CreateSurface(rVk.surface, rVk.window, rVk.instance);
-  PickPhysicalDevice(rVk.physical_device, rVk.instance, rVk.surface);
-  SetQueueFamilies(rVk.queue_families, rVk.physical_device, rVk.surface);
-  CreateLogicalDevice(rVk.device, rVk.queue_families, rVk.physical_device, rVk.surface);
-  SetQueues(rVk.queues, rVk.queue_families, rVk.device);
-  CreateSwapChain(rVk.swap_chain, rVk.images, rVk.image_format, rVk.extent, rVk.device, rVk.physical_device, rVk.surface, rVk.window, rVk.queue_families);
-  CreateImageViews(rVk.image_views, rVk.images, rVk.image_format, rVk.device);
-  CreateRenderPass(rVk.render_pass, rVk.image_format, rVk.device);
-  CreateGraphicsPipeline(rVk.graphics_pipeline, rVk.pipeline_layout, rVk.device, rVk.render_pass, meta.binary_dir);
-  CreateFramebuffers(rVk.framebuffers, rVk.image_views, rVk.device, rVk.render_pass, rVk.extent);
-  CreateCommandPool(rVk.command_pool, rVk.queue_families, rVk.device);
-  CreateCommandBuffers(rVk.command_buffers, rVk.device, rVk.command_pool);
-  CreateSyncObjects(rVk.sync, rVk.device);
+  CreateWindow(
+      rVk.swap_chain.window,
+      rVk.swap_chain.state);
+  CreateInstance(
+      rVk.instance);
+  Dbg::CreateDebugMessenger(
+      rVkDbg.messenger, 
+      rVk.instance);
+  CreateSurface(
+      rVk.swap_chain.surface, 
+      rVk.swap_chain.window, 
+      rVk.instance);
+  PickPhysicalDevice(
+      rVk.swap_chain.physical_device, 
+      rVk.instance, 
+      rVk.swap_chain.surface);
+  SetQueueFamilies(
+      rVk.swap_chain.queue_families, 
+      rVk.swap_chain.physical_device, 
+      rVk.swap_chain.surface);
+  CreateLogicalDevice(
+      rVk.swap_chain.device, 
+      rVk.swap_chain.queue_families, 
+      rVk.swap_chain.physical_device, 
+      rVk.swap_chain.surface);
+  SetQueues(
+      rVk.queues, 
+      rVk.swap_chain.queue_families, 
+      rVk.swap_chain.device);
+  CreateSwapChainComponents(
+      rVk.swap_chain);
+  CreateGraphicsPipeline(
+      rVk.graphics_pipeline, 
+      rVk.pipeline_layout, 
+      rVk.swap_chain.device, 
+      rVk.swap_chain.render_pass, 
+      meta.binary_dir);
+  CreateCommandPool(
+      rVk.command_pool, 
+      rVk.swap_chain.queue_families, 
+      rVk.swap_chain.device);
+  CreateCommandBuffers(
+      rVk.command_buffers, 
+      rVk.swap_chain.device, 
+      rVk.command_pool);
+  CreateSyncObjects(
+      rVk.sync, 
+      rVk.swap_chain.device);
 }
 
 
 ///
 void App::Cleanup(Vulkan& rVk, VulkanDebug& rVkDbg) noexcept
 {
+  CleanupSwapChain(
+      rVk.swap_chain.framebuffers, 
+      rVk.swap_chain.image_views, 
+      rVk.swap_chain.handle, 
+      rVk.swap_chain.device);
+
+  vkDestroyCommandPool(rVk.swap_chain.device, rVk.command_pool, nullptr);
+  
+  vkDestroyPipeline(rVk.swap_chain.device, rVk.graphics_pipeline, nullptr);
+  vkDestroyPipelineLayout(rVk.swap_chain.device, rVk.pipeline_layout, nullptr);
+  vkDestroyRenderPass(rVk.swap_chain.device, rVk.swap_chain.render_pass, nullptr);
+  
   for (auto image_available_semaphore : rVk.sync.image_available_semaphores)
-    vkDestroySemaphore(rVk.device, image_available_semaphore, nullptr);
-  
+    vkDestroySemaphore(rVk.swap_chain.device, image_available_semaphore, nullptr);
   for (auto render_finished_semaphore : rVk.sync.render_finished_semaphores)
-    vkDestroySemaphore(rVk.device, render_finished_semaphore, nullptr);
-  
+    vkDestroySemaphore(rVk.swap_chain.device, render_finished_semaphore, nullptr);
   for (auto in_flight_fence : rVk.sync.in_flight_fences)
-    vkDestroyFence(rVk.device, in_flight_fence, nullptr);
+    vkDestroyFence(rVk.swap_chain.device, in_flight_fence, nullptr);
   
-  vkDestroyCommandPool(rVk.device, rVk.command_pool, nullptr);
-  
-  for (auto framebuffer : rVk.framebuffers)
-    vkDestroyFramebuffer(rVk.device, framebuffer, nullptr);
-  
-  vkDestroyPipeline(rVk.device, rVk.graphics_pipeline, nullptr);
-  vkDestroyPipelineLayout(rVk.device, rVk.pipeline_layout, nullptr);
-  vkDestroyRenderPass(rVk.device, rVk.render_pass, nullptr);
-  
-  for (auto image_view : rVk.image_views)
-    vkDestroyImageView(rVk.device, image_view, nullptr);
-  
-  vkDestroySwapchainKHR(rVk.device, rVk.swap_chain, nullptr);
-  vkDestroyDevice(rVk.device, nullptr);
+  vkDestroyDevice(rVk.swap_chain.device, nullptr);
   Dbg::DestroyDebugMessenger(rVkDbg.messenger, rVk.instance);
-  vkDestroySurfaceKHR(rVk.instance, rVk.surface, nullptr);
+  vkDestroySurfaceKHR(rVk.instance, rVk.swap_chain.surface, nullptr);
   vkDestroyInstance(rVk.instance, nullptr);
-  glfwDestroyWindow(rVk.window);
+  glfwDestroyWindow(rVk.swap_chain.window);
   glfwTerminate();
 }
 

@@ -32,6 +32,7 @@ namespace App::Dbg {
     std::cout << Dbg::VLK_VERB << " " << COL_ORANGE << func_name << COL_NO << " : ";
     ( (std::cout << args), ...  );
     std::cout << '\n';
+    std::cout.flush();
 #endif // !NDEBUG
   }
   

@@ -17,13 +17,13 @@ void App::Init(Data& data)
 /// Loops application
 void App::MainLoop(Data& data) 
 {
-  while ( !glfwWindowShouldClose(data.vulkan.window) ) 
+  while ( !glfwWindowShouldClose(data.vulkan.swap_chain.window) ) 
   {
     glfwPollEvents();
     DrawFrame(data);
   }
 
-  vkDeviceWaitIdle(data.vulkan.device);
+  vkDeviceWaitIdle(data.vulkan.swap_chain.device);
 }
 
 

@@ -1,8 +1,8 @@
 
 #pragma once
 
-
 #include <cstdint>
+#include <cstdlib>
 #include <filesystem>
 #include <vector>
 
@@ -12,7 +12,6 @@
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
 
-#include <helpers/flags.hpp>
 #include <helpers/mini-vec.hpp>
 #include <decl.hpp>
 
@@ -21,10 +20,10 @@ namespace App {
   
   // --------- Aliases ----------
   using Window = GLFWwindow*;
-  using Images = Container<VkImage>;
-  using ImageViews = Container<VkImageView>;
-  using Framebuffers = Container<VkFramebuffer>;
-  using CommandBuffers = Container<VkCommandBuffer>;
+  using Images = CapContainer<VkImage>;
+  using ImageViews = CapContainer<VkImageView>;
+  using Framebuffers = CapContainer<VkFramebuffer>;
+  using CommandBuffers = NoCapContainer<VkCommandBuffer>;
   // ----------------------------
 
 
@@ -40,7 +39,7 @@ namespace App {
   {
     uint32_t graphics_family;
     uint32_t present_family;
-    flags<QUEUE_FAMILIES_BITS> supported_families;
+    QUEUE_FAMILIES_BITS_T supported_families;
   };
   
   struct Queues 
@@ -51,20 +50,33 @@ namespace App {
 
   struct SyncObjects
   {
-    Container<VkSemaphore> image_available_semaphores;
-    Container<VkSemaphore> render_finished_semaphores;
-    Container<VkFence> in_flight_fences;
+    NoCapContainer<VkSemaphore> image_available_semaphores;
+    NoCapContainer<VkSemaphore> render_finished_semaphores;
+    NoCapContainer<VkFence>     in_flight_fences;
   };
 
-  struct Frame
+  struct SwapChainComponents 
   {
+    QueueFamilies     queue_families;
+    Images            images;
+    ImageViews        image_views;
+    Framebuffers      framebuffers;
+    Window            window;
+    VkSwapchainKHR    handle;
+    VkFormat          image_format;
+    VkExtent2D        extent;
+    VkDevice          device;
+    VkPhysicalDevice  physical_device = VK_NULL_HANDLE;
+    VkSurfaceKHR      surface;
+    VkRenderPass      render_pass;
+    SWAPCHAIN_STATE_BITS_T state;
   };
 
   struct SwapChainSupportDetails
   {
     VkSurfaceCapabilitiesKHR capabilities;
-    Container<VkSurfaceFormatKHR> formats;
-    Container<VkPresentModeKHR> present_modes;
+    NoCapContainer<VkSurfaceFormatKHR> formats;
+    NoCapContainer<VkPresentModeKHR> present_modes;
   };
 
   // --- Debug struct
@@ -76,26 +88,18 @@ namespace App {
   // --- Main struct
   struct Vulkan 
   {
-    Images images;
-    ImageViews image_views;
-    Framebuffers framebuffers;
+    SwapChainComponents swap_chain;
+
     Queues queues;
-    QueueFamilies queue_families;
     SyncObjects sync;
     CommandBuffers command_buffers;
-    uint32_t current_frame;
-    VkSwapchainKHR swap_chain;
-    VkFormat image_format;
-    VkExtent2D extent;
-    VkDevice device;
-    VkPhysicalDevice physical_device = VK_NULL_HANDLE;
-    VkSurfaceKHR surface;
+
     VkInstance instance;
     VkPipelineLayout pipeline_layout;
-    VkRenderPass render_pass;
     VkPipeline graphics_pipeline;
     VkCommandPool command_pool;
-    GLFWwindow* window;
+
+    uint32_t current_frame;
 
     VulkanDebug dbg;
   };
@@ -146,7 +150,8 @@ namespace App {
     noexcept;
   
   void CreateWindow(
-      Window& rWindow);
+      Window&         rWindow,
+      SWAPCHAIN_STATE_BITS_T& rSwapChainState);
 
   void CreateInstance(
       VkInstance& rInstance);
@@ -177,6 +182,9 @@ namespace App {
       const QueueFamilies& queueFamilies, 
       VkDevice             logicalDevice);
 
+  
+  // -------- Swap chain -----------
+  // --- Lower-deps functions
   void CreateSwapChain(
       VkSwapchainKHR&       rSwapChain,
       Images&               rImages,
@@ -187,6 +195,20 @@ namespace App {
       VkSurfaceKHR          surface,
       Window                window,
       const QueueFamilies&  queueFamilies);
+  
+  void RecreateSwapChain(
+      Framebuffers&        rFramebuffers,
+      ImageViews&          rImageViews,
+      Images&              rImages,
+      VkFormat&            rImageFormat,
+      VkExtent2D&          rImageExtent,
+      VkSwapchainKHR&      rSwapChain,
+      const QueueFamilies& queueFamilies,
+      VkDevice             logicalDevice,
+      VkPhysicalDevice     physicalDevice,
+      VkSurfaceKHR         surface,
+      Window               window,
+      VkRenderPass         renderPass);
 
   void CreateImageViews(
       ImageViews&   rImageViews, 
@@ -199,19 +221,75 @@ namespace App {
       VkFormat      imageFormat,
       VkDevice      logicalDevice);
   
-  void CreateGraphicsPipeline(
-      VkPipeline&                  rGraphicsPipeline,
-      VkPipelineLayout&            rPipelineLayout,
-      VkDevice                     logicalDevice,
-      VkRenderPass                 renderPass,
-      const std::filesystem::path& mainBinaryDir);
-  
   void CreateFramebuffers(
       Framebuffers&     rFramebuffers,
       const ImageViews& imageViews,
       VkDevice          logicalDevice, 
       VkRenderPass      renderPass,
       VkExtent2D        framebufferExtent);
+
+  void CleanupSwapChain(
+      Framebuffers&   rFramebuffers,
+      ImageViews&     rImageViews,
+      VkSwapchainKHR  swapChain,
+      VkDevice        logicalDevice);
+  
+  // --- Swapchain components
+  inline void CreateSwapChainComponents(
+      SwapChainComponents& rSwapChain)
+  {
+    CreateSwapChain(
+        rSwapChain.handle,
+        rSwapChain.images,
+        rSwapChain.image_format,
+        rSwapChain.extent,
+        rSwapChain.device,
+        rSwapChain.physical_device,
+        rSwapChain.surface,
+        rSwapChain.window,
+        rSwapChain.queue_families);
+    CreateImageViews(
+        rSwapChain.image_views, 
+        rSwapChain.images, 
+        rSwapChain.image_format, 
+        rSwapChain.device);
+    CreateRenderPass(
+        rSwapChain.render_pass, 
+        rSwapChain.image_format, 
+        rSwapChain.device);
+    CreateFramebuffers(
+        rSwapChain.framebuffers, 
+        rSwapChain.image_views, 
+        rSwapChain.device, 
+        rSwapChain.render_pass, 
+        rSwapChain.extent);
+  }
+
+  inline void RecreateSwapChainComponents(
+      SwapChainComponents& rSwapChain)
+  {
+    RecreateSwapChain(
+        rSwapChain.framebuffers, 
+        rSwapChain.image_views, 
+        rSwapChain.images, 
+        rSwapChain.image_format, 
+        rSwapChain.extent, 
+        rSwapChain.handle, 
+        rSwapChain.queue_families, 
+        rSwapChain.device, 
+        rSwapChain.physical_device, 
+        rSwapChain.surface, 
+        rSwapChain.window, 
+        rSwapChain.render_pass);
+  }
+  // ----------------------------
+
+  void CreateGraphicsPipeline(
+      VkPipeline&                  rGraphicsPipeline,
+      VkPipelineLayout&            rPipelineLayout,
+      VkDevice                     logicalDevice,
+      VkRenderPass                 renderPass,
+      const std::filesystem::path& mainBinaryDir);
 
   void CreateCommandPool(
       VkCommandPool&        rCommandPool,
@@ -237,13 +315,9 @@ namespace App {
   void DrawFrame(
       uint32_t&           rLastFrame,
       CommandBuffers&     rCommandBuffers,
+      SwapChainComponents& rSwapChain,
       const SyncObjects&  syncObjects,
       const Queues&       queues,
-      const Framebuffers& framebuffers,
-      VkDevice            logicalDevice,
-      VkSwapchainKHR      swapchain,
-      VkExtent2D          imageExtent,
-      VkRenderPass        renderPass,
       VkPipeline          graphicsPipeline);
 
   void DrawFrame(Data& rData);
@@ -259,18 +333,54 @@ namespace App {
       QueueFamilies&, 
       SwapChainSupportDetails&) noexcept;
 
-  bool CheckPhysicalDeviceExtensionsSupport(VkPhysicalDevice);
-  void QueryQueueFamilies(QueueFamilies&, VkPhysicalDevice, VkSurfaceKHR);
-  bool CheckQueueFamiliesSupport(const QueueFamilies&);
-  Container<VkDeviceQueueCreateInfo> GetVulkanQueueCreateInfos(QueueFamilies&);
-  void QuerySwapChainSupport(SwapChainSupportDetails&, VkPhysicalDevice, VkSurfaceKHR);
-  bool CheckSwapChainSupport(const SwapChainSupportDetails&);
-  VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const Container<VkSurfaceFormatKHR>&);
-  int RateSwapSurfaceFormat(VkSurfaceFormatKHR);
-  VkPresentModeKHR ChooseSwapPresentMode(const Container<VkPresentModeKHR>&);
-  int RateSwapPresentMode(VkPresentModeKHR);
-  VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR&, GLFWwindow*);
-  VkShaderModule CreateShaderModule(VkDevice dev, const std::string& code);
+  bool CheckPhysicalDeviceExtensionsSupport(
+      VkPhysicalDevice);
+
+  void QueryQueueFamilies(
+      QueueFamilies&, 
+      VkPhysicalDevice, 
+      VkSurfaceKHR);
+
+  bool CheckQueueFamiliesSupport(
+      const QueueFamilies&);
+
+  NoCapContainer<VkDeviceQueueCreateInfo> GetVulkanQueueCreateInfos(
+      QueueFamilies&);
+
+  void QuerySwapChainSupport(
+      SwapChainSupportDetails&, 
+      VkPhysicalDevice, 
+      VkSurfaceKHR);
+
+  bool CheckSwapChainSupport(
+      const SwapChainSupportDetails&);
+
+  VkSurfaceFormatKHR ChooseSwapSurfaceFormat(
+      const NoCapContainer<VkSurfaceFormatKHR>&);
+
+  int RateSwapSurfaceFormat(
+      VkSurfaceFormatKHR);
+
+  VkPresentModeKHR ChooseSwapPresentMode(
+      const NoCapContainer<VkPresentModeKHR>&);
+
+  int RateSwapPresentMode(
+      VkPresentModeKHR);
+
+  VkExtent2D ChooseSwapExtent(
+      const VkSurfaceCapabilitiesKHR&, 
+      Window);
+
+  VkShaderModule CreateShaderModule(
+      VkDevice           logicalDevice, 
+      const std::string& code);
+
+  // --- Callbacks
+  void FramebufferResizeCallback(
+      GLFWwindow* window, 
+      int         width,
+      int         height);
+
   // --------------------
 
   // --------------------

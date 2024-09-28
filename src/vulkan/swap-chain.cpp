@@ -1,5 +1,6 @@
-  
+ 
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -11,18 +12,18 @@
 
 /// Creates swap chain
 void App::CreateSwapChain(
-    VkSwapchainKHR& swap_chain,
-    Images& images,
-    VkFormat& image_format,
-    VkExtent2D& image_extent,
-    VkDevice logical_device,
-    VkPhysicalDevice physical_device,
-    VkSurfaceKHR surface,
-    Window window,
-    const QueueFamilies& qf)
+    VkSwapchainKHR&       rSwapChain,
+    Images&               rImages,
+    VkFormat&             rImageFormat,
+    VkExtent2D&           rImageExtent,
+    VkDevice              logicalDevice,
+    VkPhysicalDevice      physicalDevice,
+    VkSurfaceKHR          surface,
+    Window                window,
+    const QueueFamilies&  queueFamilies)
 {
   SwapChainSupportDetails swap_chain_support {};
-  QuerySwapChainSupport(swap_chain_support, physical_device, surface);
+  QuerySwapChainSupport(swap_chain_support, physicalDevice, surface);
   
   VkSurfaceFormatKHR surface_format = ChooseSwapSurfaceFormat(swap_chain_support.formats);
   VkPresentModeKHR present_mode = ChooseSwapPresentMode(swap_chain_support.present_modes);
@@ -48,11 +49,11 @@ void App::CreateSwapChain(
   create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
   
   uint32_t queue_family_indices[] = { 
-    qf.graphics_family, 
-    qf.present_family
+    queueFamilies.graphics_family, 
+    queueFamilies.present_family
   };
 
-  if ( qf.graphics_family != qf.present_family ) {    // It is required for VK_SHARING_MODE_CONCURRENT to specify shared queue families
+  if ( queueFamilies.graphics_family != queueFamilies.present_family ) {    // It is required for VK_SHARING_MODE_CONCURRENT to specify shared queue families
     create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
     create_info.queueFamilyIndexCount = 2;
     create_info.pQueueFamilyIndices = queue_family_indices;
@@ -70,17 +71,82 @@ void App::CreateSwapChain(
   create_info.clipped = VK_TRUE; // enable clipping if window is back to other windows
   create_info.oldSwapchain = VK_NULL_HANDLE;
 
-  if ( vkCreateSwapchainKHR(logical_device, &create_info, nullptr, &swap_chain) != VK_SUCCESS )
+  if ( vkCreateSwapchainKHR(logicalDevice, &create_info, nullptr, &rSwapChain) != VK_SUCCESS )
     throw Except::Swap_Chain_Creation_Failure{__FUNCTION__};
   Dbg::PrintFunctionInfo(__FUNCTION__, "Created swapchain");
 
   // Retrieve image handles
-  vkGetSwapchainImagesKHR(logical_device, swap_chain, &image_count, nullptr);
-  images.resize(image_count);
-  vkGetSwapchainImagesKHR(logical_device, swap_chain, &image_count, images.data());
+  vkGetSwapchainImagesKHR(logicalDevice, rSwapChain, &image_count, nullptr);
+  rImages.resize(image_count);
+  vkGetSwapchainImagesKHR(logicalDevice, rSwapChain, &image_count, rImages.data());
 
-  image_format = surface_format.format;
-  image_extent = extent;
+  rImageFormat = surface_format.format;
+  rImageExtent = extent;
+}
+
+
+
+///
+void App::RecreateSwapChain(
+    Framebuffers&        rFramebuffers,
+    ImageViews&          rImageViews,
+    Images&              rImages,
+    VkFormat&            rImageFormat,
+    VkExtent2D&          rImageExtent,
+    VkSwapchainKHR&      rSwapChain,
+    const QueueFamilies& queueFamilies,
+    VkDevice             logicalDevice,
+    VkPhysicalDevice     physicalDevice,
+    VkSurfaceKHR         surface,
+    Window               window,
+    VkRenderPass         renderPass)
+{
+  vkDeviceWaitIdle(logicalDevice);
+  CleanupSwapChain(
+      rFramebuffers, 
+      rImageViews, 
+      rSwapChain, 
+      logicalDevice);
+  CreateSwapChain(
+      rSwapChain,
+      rImages,
+      rImageFormat,
+      rImageExtent,
+      logicalDevice,
+      physicalDevice,
+      surface,
+      window,
+      queueFamilies);
+  CreateImageViews(
+      rImageViews, 
+      rImages, 
+      rImageFormat, 
+      logicalDevice);
+  CreateFramebuffers(
+      rFramebuffers, 
+      rImageViews, 
+      logicalDevice, 
+      renderPass, 
+      rImageExtent);
+}
+
+
+///
+void App::CleanupSwapChain(
+    Framebuffers&   rFramebuffers,
+    ImageViews&     rImageViews,
+    VkSwapchainKHR  swapChain,
+    VkDevice        logicalDevice)
+{
+  for (auto framebuffer : rFramebuffers)
+    vkDestroyFramebuffer(logicalDevice, framebuffer, nullptr);
+  rFramebuffers.clear();
+
+  for (auto image_view : rImageViews)
+    vkDestroyImageView(logicalDevice, image_view, nullptr);
+  rImageViews.clear();
+
+  vkDestroySwapchainKHR(logicalDevice, swapChain, nullptr);
 }
 
 
@@ -115,7 +181,7 @@ void App::QuerySwapChainSupport(SwapChainSupportDetails& details, VkPhysicalDevi
 
 
 /// @return the most appropriate format
-VkSurfaceFormatKHR App::ChooseSwapSurfaceFormat(const Container<VkSurfaceFormatKHR>& available_formats)
+VkSurfaceFormatKHR App::ChooseSwapSurfaceFormat(const NoCapContainer<VkSurfaceFormatKHR>& available_formats)
 {
   std::size_t best_candidate_index = 0;
   int best_score = 0;
@@ -149,7 +215,7 @@ int App::RateSwapSurfaceFormat(VkSurfaceFormatKHR sf_format)
 
 
 ///
-VkPresentModeKHR App::ChooseSwapPresentMode(const Container<VkPresentModeKHR>& present_modes)
+VkPresentModeKHR App::ChooseSwapPresentMode(const NoCapContainer<VkPresentModeKHR>& present_modes)
 {
   std::size_t best_candidate_index = 0;
   int best_score = 0;
