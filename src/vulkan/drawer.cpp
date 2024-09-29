@@ -37,6 +37,15 @@ void App::DrawFrame(
   VkResult result;
   uint32_t image_index;
   
+
+  if (rSwapChain.state & SWAPCHAIN_STATE_FRAMEBUFFER_RESIZED) 
+  {
+    Dbg::PrintFunctionInfo(__FUNCTION__, "Recreating swap chain");
+    rSwapChain.state &= ~SWAPCHAIN_STATE_FRAMEBUFFER_RESIZED;
+    RecreateSwapChainComponents(rSwapChain);
+    return;
+  }
+  
   result = vkAcquireNextImageKHR(
       rSwapChain.device, 
       rSwapChain.handle, 
@@ -44,18 +53,10 @@ void App::DrawFrame(
       sync.image_available_semaphores[rLastFrame], 
       VK_NULL_HANDLE, 
       &image_index);
-
-  if (result == VK_ERROR_OUT_OF_DATE_KHR  || 
-      rSwapChain.state & SWAPCHAIN_STATE_FRAMEBUFFER_RESIZED) 
-  {
-    Dbg::PrintFunctionInfo(__FUNCTION__, "Recreating swap chain");
-    rSwapChain.state &= ~SWAPCHAIN_STATE_FRAMEBUFFER_RESIZED;
-    RecreateSwapChainComponents(rSwapChain);
-    return;
-  } else if (result != VK_SUCCESS && 
-             result != VK_SUBOPTIMAL_KHR)
-    throw Except::Image_Acquiring_Failure{__FUNCTION__};
   
+  if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+    throw Except::Image_Acquiring_Failure{__FUNCTION__};
+
 
   vkResetFences(
       rSwapChain.device, 
@@ -104,19 +105,20 @@ void App::DrawFrame(
   present_info.pImageIndices = &image_index;
   present_info.pResults = nullptr;
 
-  result = vkQueuePresentKHR(
-      queues.presentation_queue, 
-      &present_info);
 
-  if (result == VK_ERROR_OUT_OF_DATE_KHR || 
-      result == VK_SUBOPTIMAL_KHR        ||
-      rSwapChain.state & SWAPCHAIN_STATE_FRAMEBUFFER_RESIZED)
+  if (rSwapChain.state & SWAPCHAIN_STATE_FRAMEBUFFER_RESIZED)
   {
     // FIX: doesn't show third argument in cout
     Dbg::PrintFunctionInfo(__FUNCTION__, "Recreating swap chain");
     rSwapChain.state &= ~SWAPCHAIN_STATE_FRAMEBUFFER_RESIZED;
     RecreateSwapChainComponents(rSwapChain);
-  } else if (result != VK_SUCCESS)
+  }
+  
+  result = vkQueuePresentKHR(
+      queues.presentation_queue, 
+      &present_info);
+  
+  if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
     throw Except::Image_Presentation_Failure{__FUNCTION__};
 
   rLastFrame = (rLastFrame + 1) % MAX_FRAMES_IN_FLIGHT;
