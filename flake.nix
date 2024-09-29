@@ -1,20 +1,17 @@
 {
-  description = "Vulkan tutorial flake";
-
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs }: 
-  let 
-    system = "x86_64-linux";
-    pkgs = import nixpkgs { inherit system; };
-  in 
-  {
-    packages.${system} = {
-      default = pkgs.mkShell { 
-        shellHook = ''echo "Hello Flake!"'';
-      };
-    };
-  };
+  outputs = { self, nixpkgs, flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system: 
+      let
+        pkgs = import nixpkgs { inherit system; };
+      in
+      { 
+        devShells.default = import ./shell.nix { inherit pkgs; };
+      }
+    );
 }
+
