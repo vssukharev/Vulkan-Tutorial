@@ -328,13 +328,33 @@ namespace App {
   void SetVertices(
       Vertices& rVertices);
 
-  void CreateVertexBuffer(
+  void CreateBuffer(
       VkBuffer&             rBuffer,
       VkDeviceMemory&       rBufferMemory,
-      const Vertices&       vertices,
+      VkDeviceSize          bufferSize,
+      VkBufferUsageFlags    bufferUsage,
+      VkMemoryPropertyFlags memoryProperties,
       const QueueFamilies&  queueFamilies,
       VkDevice              logicalDevice,
       VkPhysicalDevice      physicalDevice);
+
+  void CopyBuffer(
+    VkBuffer      srcBuffer,
+    VkBuffer      dstBuffer,
+    VkDeviceSize  buffersSize,
+    VkCommandPool commandPool,
+    VkQueue       submitQueue,
+    VkDevice      logicalDevice);
+
+  void CreateVertexBuffer(
+      VkBuffer&             rVertBuffer,
+      VkDeviceMemory&       rVertBufferMemory,
+      const Vertices&       vertices,
+      const QueueFamilies&  queueFamilies,
+      VkQueue               submitQueue,
+      VkDevice              logicalDevice,
+      VkPhysicalDevice      physicalDevice,
+      VkCommandPool         commandPool);
 
   void CreateCommandBuffers(
       CommandBuffers&     rCommandBuffers,

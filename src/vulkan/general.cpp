@@ -61,8 +61,10 @@ void App::Init(Vulkan& rVk, VulkanDebug& rVkDbg, const Meta& meta)
       rVk.vertex_buffer_mem, 
       rVk.vertices,
       rVk.swap_chain.queue_families,
+      rVk.queues.transfer,
       rVk.swap_chain.device, 
-      rVk.swap_chain.physical_device);
+      rVk.swap_chain.physical_device,
+      rVk.command_pools.transfer);
   CreateCommandBuffers(
       rVk.command_buffers, 
       rVk.swap_chain.device, 

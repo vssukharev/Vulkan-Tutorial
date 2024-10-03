@@ -1,7 +1,5 @@
 { pkgs ? import <nixpkgs> {} }: with pkgs;
   mkShell {
-    packages = [
-    ];
 
     buildInputs = [
       shaderc
@@ -11,6 +9,7 @@
       vulkan-tools-lunarg
       vulkan-helper
       vulkan-tools
+      mangohud
       vulkan-validation-layers
 
       libGL
