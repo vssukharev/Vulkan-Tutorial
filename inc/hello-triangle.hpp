@@ -40,7 +40,6 @@ namespace App {
   using Images = CapContainer<VkImage>;
   using ImageViews = CapContainer<VkImageView>;
   using Framebuffers = CapContainer<VkFramebuffer>;
-  using CommandBuffers = NoCapContainer<VkCommandBuffer>;
   using Vertices = NoCapContainer<Vertex>;
   // ----------------------------
 
@@ -56,15 +55,29 @@ namespace App {
   /// Contains indexes of queue families for selected physical device
   struct QueueFamilies
   {
-    uint32_t graphics_family;
-    uint32_t present_family;
+    uint32_t graphics;
+    uint32_t present;
+    uint32_t transfer;
     QUEUE_FAMILIES_BITS_T supported_families;
   };
   
   struct Queues 
   {
-    VkQueue graphics_queue;
-    VkQueue presentation_queue;
+    VkQueue graphics;
+    VkQueue presentation;
+    VkQueue transfer;
+  };
+
+  struct CommandPools 
+  {
+    VkCommandPool graphics;
+    VkCommandPool transfer;
+  };
+
+  struct CommandBuffers
+  {
+    NoCapContainer<VkCommandBuffer> graphics;
+    NoCapContainer<VkCommandBuffer> transfer;
   };
 
   struct SyncObjects
@@ -109,7 +122,7 @@ namespace App {
     VkInstance instance;
     VkPipelineLayout pipeline_layout;
     VkPipeline graphics_pipeline;
-    VkCommandPool command_pool;
+    CommandPools command_pools;
 
     VkBuffer vertex_buffer;
     VkDeviceMemory vertex_buffer_mem;
@@ -307,8 +320,8 @@ namespace App {
       VkRenderPass                 renderPass,
       const std::filesystem::path& mainBinaryDir);
 
-  void CreateCommandPool(
-      VkCommandPool&        rCommandPool,
+  void CreateCommandPools(
+      CommandPools&         rCommandPool,
       const QueueFamilies&  queueFamilies,
       VkDevice              logicalDevice);
 
@@ -316,16 +329,17 @@ namespace App {
       Vertices& rVertices);
 
   void CreateVertexBuffer(
-      VkBuffer&        rBuffer,
-      VkDeviceMemory&  rBufferMemory,
-      const Vertices&  vertices,
-      VkDevice         logicalDevice,
-      VkPhysicalDevice physicalDevice);
+      VkBuffer&             rBuffer,
+      VkDeviceMemory&       rBufferMemory,
+      const Vertices&       vertices,
+      const QueueFamilies&  queueFamilies,
+      VkDevice              logicalDevice,
+      VkPhysicalDevice      physicalDevice);
 
   void CreateCommandBuffers(
-      CommandBuffers& rCommandBuffers,
-      VkDevice        logicalDevice,
-      VkCommandPool   commandPool);
+      CommandBuffers&     rCommandBuffers,
+      VkDevice            logicalDevice,
+      const CommandPools& commandPools);
 
   void CreateSyncObjects(
       SyncObjects&  rSyncObjects,

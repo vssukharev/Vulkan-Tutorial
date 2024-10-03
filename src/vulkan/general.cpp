@@ -50,8 +50,8 @@ void App::Init(Vulkan& rVk, VulkanDebug& rVkDbg, const Meta& meta)
       rVk.swap_chain.device, 
       rVk.swap_chain.render_pass, 
       meta.binary_dir);
-  CreateCommandPool(
-      rVk.command_pool, 
+  CreateCommandPools(
+      rVk.command_pools, 
       rVk.swap_chain.queue_families, 
       rVk.swap_chain.device);
   SetVertices(
@@ -59,13 +59,14 @@ void App::Init(Vulkan& rVk, VulkanDebug& rVkDbg, const Meta& meta)
   CreateVertexBuffer(
       rVk.vertex_buffer, 
       rVk.vertex_buffer_mem, 
-      rVk.vertices, 
+      rVk.vertices,
+      rVk.swap_chain.queue_families,
       rVk.swap_chain.device, 
       rVk.swap_chain.physical_device);
   CreateCommandBuffers(
       rVk.command_buffers, 
       rVk.swap_chain.device, 
-      rVk.command_pool);
+      rVk.command_pools);
   CreateSyncObjects(
       rVk.sync, 
       rVk.swap_chain.device);
@@ -84,7 +85,8 @@ void App::Cleanup(Vulkan& rVk, VulkanDebug& rVkDbg) noexcept
   vkDestroyBuffer(rVk.swap_chain.device, rVk.vertex_buffer, nullptr);
   vkFreeMemory(rVk.swap_chain.device, rVk.vertex_buffer_mem, nullptr);
 
-  vkDestroyCommandPool(rVk.swap_chain.device, rVk.command_pool, nullptr);
+  vkDestroyCommandPool(rVk.swap_chain.device, rVk.command_pools.graphics, nullptr);
+  vkDestroyCommandPool(rVk.swap_chain.device, rVk.command_pools.transfer, nullptr);
   
   vkDestroyPipeline(rVk.swap_chain.device, rVk.graphics_pipeline, nullptr);
   vkDestroyPipelineLayout(rVk.swap_chain.device, rVk.pipeline_layout, nullptr);

@@ -66,9 +66,9 @@ void App::DrawFrame(
       rSwapChain.device, 
       1, &sync.in_flight_fences[rLastFrame]);
 
-  vkResetCommandBuffer(rCommandBuffers[rLastFrame], 0);
+  vkResetCommandBuffer(rCommandBuffers.graphics[rLastFrame], 0);
   RecordCommandBuffer(
-      rCommandBuffers[rLastFrame],
+      rCommandBuffers.graphics[rLastFrame],
       vertices,
       rSwapChain.framebuffers[image_index], 
       rSwapChain.extent, 
@@ -89,14 +89,13 @@ void App::DrawFrame(
   queue_submit_info.pSignalSemaphores = &sync.render_finished_semaphores[rLastFrame];
   queue_submit_info.pWaitDstStageMask = wait_stages;
   queue_submit_info.commandBufferCount = 1;
-  queue_submit_info.pCommandBuffers = &rCommandBuffers[rLastFrame];
+  queue_submit_info.pCommandBuffers = &rCommandBuffers.graphics[rLastFrame];
 
 
   result = vkQueueSubmit(
-      queues.graphics_queue, 
-      1, 
-      &queue_submit_info, 
-      sync.in_flight_fences[rLastFrame]);
+    queues.graphics, 
+    1, &queue_submit_info, 
+    sync.in_flight_fences[rLastFrame]);
   
   if (result != VK_SUCCESS)
     throw Except::Queue_Submittion_Failure{__FUNCTION__};
@@ -121,8 +120,8 @@ void App::DrawFrame(
   }
   
   result = vkQueuePresentKHR(
-      queues.presentation_queue, 
-      &present_info);
+    queues.presentation, 
+    &present_info);
   
   if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
     throw Except::Image_Presentation_Failure{__FUNCTION__};

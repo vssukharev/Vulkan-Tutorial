@@ -49,21 +49,22 @@ void App::CreateSwapChain(
   create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
   
   uint32_t queue_family_indices[] = { 
-    queueFamilies.graphics_family, 
-    queueFamilies.present_family
+    queueFamilies.graphics, 
+    queueFamilies.present
   };
 
-  if ( queueFamilies.graphics_family != queueFamilies.present_family ) {    // It is required for VK_SHARING_MODE_CONCURRENT to specify shared queue families
+  if (queueFamilies.graphics != queueFamilies.present) {
     create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
     create_info.queueFamilyIndexCount = 2;
     create_info.pQueueFamilyIndices = queue_family_indices;
-    Dbg::PrintFunctionInfo(__FUNCTION__, "Using concurrent sharing mode");
+    Dbg::PrintFunctionInfo(__FUNCTION__, "Using concurrent sharing mode for swap chain images");
   } else {
     create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     // create_info.queueFamilyIndexCount = 0;
     // create_info.pQueueFamilyIndices = nullptr;
-    Dbg::PrintFunctionInfo(__FUNCTION__, "Using exclusive sharing mode");
+    Dbg::PrintFunctionInfo(__FUNCTION__, "Using exclusive sharing mode for swap chain images");
   }
+
 
   create_info.preTransform = swap_chain_support.capabilities.currentTransform; // we donot want any transformations
   create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR; // ignore opaque windows

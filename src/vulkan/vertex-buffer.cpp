@@ -1,4 +1,5 @@
 
+#include "debug.hpp"
 #include <cstdint>
 #include <cstring>
 #include <vulkan/vulkan_core.h>
@@ -9,20 +10,29 @@
 
 ///
 void App::CreateVertexBuffer(
-    VkBuffer&        rBuffer,
-    VkDeviceMemory&  rBufferMemory,
-    const Vertices&  vertices,
-    VkDevice         logicalDevice,
-    VkPhysicalDevice physicalDevice)
+    VkBuffer&             rBuffer,
+    VkDeviceMemory&       rBufferMemory,
+    const Vertices&       vertices,
+    const QueueFamilies&  queueFamilies,
+    VkDevice              logicalDevice,
+    VkPhysicalDevice      physicalDevice)
 {
   VkBufferCreateInfo buffer_info {};
   buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
   buffer_info.size = sizeof(Vertex) * vertices.size();
   buffer_info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-  buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+  buffer_info.sharingMode = VK_SHARING_MODE_CONCURRENT;
+  uint32_t queue_family_indices[] = { 
+    queueFamilies.graphics, 
+    queueFamilies.transfer, 
+  };
+  buffer_info.queueFamilyIndexCount = 2;
+  buffer_info.pQueueFamilyIndices = queue_family_indices;
 
   if (vkCreateBuffer(logicalDevice, &buffer_info, nullptr, &rBuffer) != VK_SUCCESS)
     throw Except::Buffer_Creation_Failure{__FUNCTION__};
+
+  Dbg::PrintFunctionInfo(__FUNCTION__, "Created vertex buffer");
 
   VkMemoryRequirements mem_requirements;
   vkGetBufferMemoryRequirements(logicalDevice, rBuffer, &mem_requirements);
@@ -45,6 +55,8 @@ void App::CreateVertexBuffer(
   vkMapMemory(logicalDevice, rBufferMemory, 0, buffer_info.size, 0, &buffer_data);
   memcpy(buffer_data, vertices.data(), buffer_info.size);
   vkUnmapMemory(logicalDevice, rBufferMemory);
+
+  Dbg::PrintFunctionInfo(__FUNCTION__, "Allocated vertex buffer memory");
 }
 
 

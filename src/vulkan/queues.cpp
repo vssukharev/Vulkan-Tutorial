@@ -1,4 +1,5 @@
 
+#include "decl.hpp"
 #include "hello-triangle.hpp"
 #include <set>
 
@@ -16,8 +17,9 @@ void App::SetQueueFamilies(QueueFamilies& qf, VkPhysicalDevice physical_dev, VkS
 
 void App::SetQueues(Queues& queues, const QueueFamilies& qf, VkDevice logical_device)
 {
-  vkGetDeviceQueue(logical_device, qf.graphics_family, 0, &queues.graphics_queue);
-  vkGetDeviceQueue(logical_device, qf.present_family, 0, &queues.presentation_queue);
+  vkGetDeviceQueue(logical_device, qf.graphics, 0, &queues.graphics);
+  vkGetDeviceQueue(logical_device, qf.present, 0, &queues.presentation);
+  vkGetDeviceQueue(logical_device, qf.transfer, 0, &queues.transfer);
 }
 
 /// WARN: we can check for queue families only after setting Vulkan_Queue_Families::present_families
@@ -25,7 +27,8 @@ void App::SetQueues(Queues& queues, const QueueFamilies& qf, VkDevice logical_de
 bool App::CheckQueueFamiliesSupport(const QueueFamilies& qf)
 {
   return qf.supported_families & QUEUE_FAMILY_GRAPHICS &&
-         qf.supported_families & QUEUE_FAMILY_PRESENTATION;
+         qf.supported_families & QUEUE_FAMILY_PRESENTATION &&
+         qf.supported_families & QUEUE_FAMILY_TRANSFER;
 }
 
 
@@ -43,21 +46,27 @@ void App::QueryQueueFamilies(QueueFamilies& qf, VkPhysicalDevice dev, VkSurfaceK
   {
     if (queue_family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
       qf.supported_families |= QUEUE_FAMILIES_BITS::QUEUE_FAMILY_GRAPHICS;
-      qf.graphics_family = family_index;
+      qf.graphics = family_index;
+    }
+
+    if (queue_family.queueFlags & VK_QUEUE_TRANSFER_BIT) {
+      qf.supported_families |= QUEUE_FAMILIES_BITS::QUEUE_FAMILY_TRANSFER;
+      qf.transfer = family_index;
     }
     
     VkBool32 present_support = false;
     vkGetPhysicalDeviceSurfaceSupportKHR(dev, family_index, surface, &present_support);
     if (present_support) {
       qf.supported_families |= QUEUE_FAMILIES_BITS::QUEUE_FAMILY_PRESENTATION;
-      qf.present_family = family_index;
+      qf.present = family_index;
     }
 
     ++family_index;
   }
 
-  Dbg::PrintFunctionInfo(__FUNCTION__, "Graphics family = ", qf.graphics_family);
-  Dbg::PrintFunctionInfo(__FUNCTION__, "Present family = ", qf.present_family);
+  Dbg::PrintFunctionInfo(__FUNCTION__, "Graphics family = ", qf.graphics);
+  Dbg::PrintFunctionInfo(__FUNCTION__, "Present family = ", qf.present);
+  Dbg::PrintFunctionInfo(__FUNCTION__, "Transfer family = ", qf.transfer);
 }
 
 

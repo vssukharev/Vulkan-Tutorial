@@ -12,6 +12,7 @@ namespace App {
   {
     QUEUE_FAMILY_GRAPHICS     = 0x1,
     QUEUE_FAMILY_PRESENTATION = 0x2,
+    QUEUE_FAMILY_TRANSFER     = 0x4,
   };
   using QUEUE_FAMILIES_BITS_T = std::underlying_type_t<QUEUE_FAMILIES_BITS>;
 

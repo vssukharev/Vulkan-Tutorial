@@ -1,4 +1,5 @@
 
+#include "config.hpp"
 #include <cstdint>
 
 #include <debug.hpp>
@@ -8,25 +9,33 @@
 
 ///
 void App::CreateCommandBuffers(
-    CommandBuffers& rCommandBuffers,
-    VkDevice        logicalDevice,
-    VkCommandPool   commandPool)
+    CommandBuffers&     rCommandBuffers,
+    VkDevice            logicalDevice,
+    const CommandPools& commandPools)
 {
-  rCommandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+  rCommandBuffers.graphics.resize(MAX_FRAMES_IN_FLIGHT);
+  rCommandBuffers.transfer.resize(MAX_FRAMES_IN_FLIGHT);
 
-  VkCommandBufferAllocateInfo alloc_info {};
-  alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-  alloc_info.commandPool = commandPool;
-  // level can be:
-  // VK_COMMAND_BUFFER_LEVEL_PRIMARY - can be submitted to a queue for execution, but cannot be called from other command buffers
-  // VK_COMMAND_BUFFER_LEVEL_SECONDARY - cannot be submited directly, but can be called from primary command buffers
-  alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-  alloc_info.commandBufferCount = rCommandBuffers.size();
+  VkCommandBufferAllocateInfo graphics_alloc_info {};
+  graphics_alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  graphics_alloc_info.commandPool = commandPools.graphics;
+  graphics_alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  graphics_alloc_info.commandBufferCount = rCommandBuffers.graphics.size();
 
-  if ( vkAllocateCommandBuffers(logicalDevice, &alloc_info, rCommandBuffers.data()) != VK_SUCCESS )
+  if ( vkAllocateCommandBuffers(logicalDevice, &graphics_alloc_info, rCommandBuffers.graphics.data()) != VK_SUCCESS )
     throw Except::Command_Buffer_Allocation_Failure{__FUNCTION__};
+  Dbg::PrintFunctionInfo(__FUNCTION__, "Allocated ",  rCommandBuffers.graphics.size(), " graphics command buffers");
+ 
 
-  Dbg::PrintFunctionInfo(__FUNCTION__, "Allocated command ",  rCommandBuffers.size(), " buffers");
+  VkCommandBufferAllocateInfo transfer_alloc_info {};
+  transfer_alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+  transfer_alloc_info.commandPool = commandPools.transfer;
+  transfer_alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+  transfer_alloc_info.commandBufferCount = rCommandBuffers.transfer.size();
+
+  if ( vkAllocateCommandBuffers(logicalDevice, &transfer_alloc_info, rCommandBuffers.transfer.data()) != VK_SUCCESS )
+    throw Except::Command_Buffer_Allocation_Failure{__FUNCTION__};
+  Dbg::PrintFunctionInfo(__FUNCTION__, "Allocated ",  rCommandBuffers.transfer.size(), " transfer command buffers");
 }
 
 

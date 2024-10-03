@@ -20,8 +20,9 @@ void App::CreateLogicalDevice(
   std::vector<VkDeviceQueueCreateInfo> queue_create_infos {};
   
   std::set<uint32_t> unique_queue_families { 
-    qf.graphics_family, 
-    qf.present_family 
+    qf.graphics, 
+    qf.present,
+    qf.transfer
   };
 
   float queue_priority = 1.0f;
