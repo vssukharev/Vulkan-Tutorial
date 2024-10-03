@@ -54,6 +54,14 @@ void App::Init(Vulkan& rVk, VulkanDebug& rVkDbg, const Meta& meta)
       rVk.command_pool, 
       rVk.swap_chain.queue_families, 
       rVk.swap_chain.device);
+  SetVertices(
+      rVk.vertices);
+  CreateVertexBuffer(
+      rVk.vertex_buffer, 
+      rVk.vertex_buffer_mem, 
+      rVk.vertices, 
+      rVk.swap_chain.device, 
+      rVk.swap_chain.physical_device);
   CreateCommandBuffers(
       rVk.command_buffers, 
       rVk.swap_chain.device, 
@@ -72,6 +80,9 @@ void App::Cleanup(Vulkan& rVk, VulkanDebug& rVkDbg) noexcept
       rVk.swap_chain.image_views, 
       rVk.swap_chain.handle, 
       rVk.swap_chain.device);
+
+  vkDestroyBuffer(rVk.swap_chain.device, rVk.vertex_buffer, nullptr);
+  vkFreeMemory(rVk.swap_chain.device, rVk.vertex_buffer_mem, nullptr);
 
   vkDestroyCommandPool(rVk.swap_chain.device, rVk.command_pool, nullptr);
   

@@ -32,18 +32,16 @@ void App::CreateCommandBuffers(
 
 ///
 void App::RecordCommandBuffer(
-    VkCommandBuffer& rCommandBuffer,
-    VkFramebuffer framebuffer,
-    VkExtent2D imageExtent,
-    VkRenderPass renderPass,
-    VkPipeline graphicsPipeline)
+    VkCommandBuffer&  rCommandBuffer,
+    const Vertices&   vertices,
+    VkFramebuffer     framebuffer,
+    VkExtent2D        imageExtent,
+    VkRenderPass      renderPass,
+    VkPipeline        graphicsPipeline,
+    VkBuffer          vertexBuffer)
 {
   VkCommandBufferBeginInfo begin_info {};
   begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-  // flags can be:
-  // VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT - the command buffer will be rerecorded right after executing it once
-  // VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT - this is a secondary command buffer that will be entirely within a single render pass
-  // VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT - the command buffer can be resubmitted while it is also already pending execution
 
   if ( vkBeginCommandBuffer(rCommandBuffer, &begin_info) != VK_SUCCESS )
     throw Except::Begin_Command_Buffer_Failure{__FUNCTION__};
@@ -62,6 +60,10 @@ void App::RecordCommandBuffer(
 
   vkCmdBeginRenderPass(rCommandBuffer, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
   vkCmdBindPipeline(rCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+  
+  VkBuffer vertex_buffers[] = { vertexBuffer };
+  VkDeviceSize offsets[] = { 0 };
+  vkCmdBindVertexBuffers(rCommandBuffer, 0, 1, vertex_buffers, offsets);
 
   VkViewport viewport {};
   viewport.x = 0.0f;
@@ -81,7 +83,7 @@ void App::RecordCommandBuffer(
   // 3rd - instanceCount - used for instanced rendering, set 1 if we donot care
   // 4th - firstVertex - defines the lowest value of gl_VertexIndex in vertex shader
   // 5th - firstInstance - difines the lowest value of gl_InstanceIndex in vertex shader
-  vkCmdDraw(rCommandBuffer, 3, 1, 0, 0);
+  vkCmdDraw(rCommandBuffer, vertices.size(), 1, 0, 0);
 
   vkCmdEndRenderPass(rCommandBuffer);
 

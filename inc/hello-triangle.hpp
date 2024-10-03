@@ -4,11 +4,14 @@
 #include <cstdint>
 #include <cstdlib>
 #include <filesystem>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
 #include <vector>
+#include <array>
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
-
+#include <glm/glm.hpp>
 #include <vulkan/vulkan.h>
 #include <vulkan/vulkan_core.h>
 
@@ -18,12 +21,27 @@
 namespace App {
   // ----------------------- DATA ------------------------
   
+  // --------- Helper structs ----------
+  struct Vertex {
+    glm::vec2 pos;
+    glm::vec3 color;
+  };
+
+  struct SwapChainSupportDetails
+  {
+    VkSurfaceCapabilitiesKHR capabilities;
+    NoCapContainer<VkSurfaceFormatKHR> formats;
+    NoCapContainer<VkPresentModeKHR> present_modes;
+  };
+  // -----------------------------------
+
   // --------- Aliases ----------
   using Window = GLFWwindow*;
   using Images = CapContainer<VkImage>;
   using ImageViews = CapContainer<VkImageView>;
   using Framebuffers = CapContainer<VkFramebuffer>;
   using CommandBuffers = NoCapContainer<VkCommandBuffer>;
+  using Vertices = NoCapContainer<Vertex>;
   // ----------------------------
 
 
@@ -32,8 +50,9 @@ namespace App {
   {
     std::filesystem::path binary_dir;
   };
-  // ------ Vulkan instances ------
+  // ------------------------------ 
 
+  // ------ Vulkan instances ------
   /// Contains indexes of queue families for selected physical device
   struct QueueFamilies
   {
@@ -72,13 +91,6 @@ namespace App {
     SWAPCHAIN_STATE_BITS_T state;
   };
 
-  struct SwapChainSupportDetails
-  {
-    VkSurfaceCapabilitiesKHR capabilities;
-    NoCapContainer<VkSurfaceFormatKHR> formats;
-    NoCapContainer<VkPresentModeKHR> present_modes;
-  };
-
   // --- Debug struct
   struct VulkanDebug
   {
@@ -98,6 +110,10 @@ namespace App {
     VkPipelineLayout pipeline_layout;
     VkPipeline graphics_pipeline;
     VkCommandPool command_pool;
+
+    VkBuffer vertex_buffer;
+    VkDeviceMemory vertex_buffer_mem;
+    Vertices vertices;
 
     uint32_t current_frame;
 
@@ -296,6 +312,16 @@ namespace App {
       const QueueFamilies&  queueFamilies,
       VkDevice              logicalDevice);
 
+  void SetVertices(
+      Vertices& rVertices);
+
+  void CreateVertexBuffer(
+      VkBuffer&        rBuffer,
+      VkDeviceMemory&  rBufferMemory,
+      const Vertices&  vertices,
+      VkDevice         logicalDevice,
+      VkPhysicalDevice physicalDevice);
+
   void CreateCommandBuffers(
       CommandBuffers& rCommandBuffers,
       VkDevice        logicalDevice,
@@ -307,18 +333,22 @@ namespace App {
 
   void RecordCommandBuffer(
       VkCommandBuffer&  rCommandBuffer,
+      const Vertices&   vertices,
       VkFramebuffer     framebuffer,
       VkExtent2D        imageExtent,
       VkRenderPass      renderPass,
-      VkPipeline        graphicsPipeline);
+      VkPipeline        graphicsPipeline,
+      VkBuffer          vertexBuffer);
 
   void DrawFrame(
-      uint32_t&           rLastFrame,
-      CommandBuffers&     rCommandBuffers,
-      SwapChainComponents& rSwapChain,
-      const SyncObjects&  syncObjects,
-      const Queues&       queues,
-      VkPipeline          graphicsPipeline);
+      uint32_t&             rLastFrame,
+      CommandBuffers&       rCommandBuffers,
+      SwapChainComponents&  rSwapChain,
+      const SyncObjects&    sync,
+      const Queues&         queues,
+      const Vertices&       vertices,
+      VkPipeline            graphicsPipeline,
+      VkBuffer              vertexBuffer);
 
   void DrawFrame(Data& rData);
     // ------ Vulkan ------
@@ -374,6 +404,15 @@ namespace App {
   VkShaderModule CreateShaderModule(
       VkDevice           logicalDevice, 
       const std::string& code);
+
+  VkVertexInputBindingDescription GetVertexBindingDescription();
+  
+  std::array<VkVertexInputAttributeDescription, 2> GetVertexAttributeDescriptions();
+
+  uint32_t FindMemoryType(
+      VkPhysicalDevice      physicalDevice,
+      uint32_t              typeFilter,
+      VkMemoryPropertyFlags properties);
 
   // --- Callbacks
   void FramebufferResizeCallback(

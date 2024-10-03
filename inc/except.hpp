@@ -120,6 +120,16 @@ namespace App::Except {
   {
     EXCEPT_NAME_RET name() { return "Semaphore_Creation_Failure"; }  
   };
+
+  struct Buffer_Creation_Failure : Creation_Failure<Buffer_Creation_Failure>
+  {
+    EXCEPT_NAME_RET name() { return "Buffer_Creation_Failure"; }
+  };
+
+  struct Buffer_Memory_Allocation_Failure : Creation_Failure<Buffer_Memory_Allocation_Failure>
+  {
+    EXCEPT_NAME_RET name() { return "Buffer_Memory_Allocation_Failure"; }
+  };
   // ------------------------
 
   // --- Acquiring failure ---
@@ -210,6 +220,11 @@ namespace App::Except {
   struct Shader_Code_Missing : File_Missing           
   { 
     EXCEPT_NAME_RET name() { return "Shader_Code_Missing"; }           
+  };
+
+  struct Memory_Type_Missing : Missing_Item<Memory_Type_Missing>
+  {
+    EXCEPT_NAME_RET name() { return "Memory_Type_Missing"; }
   };
   // --------------------
 }

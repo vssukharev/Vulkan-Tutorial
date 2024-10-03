@@ -33,7 +33,9 @@ namespace App {
 
       mini_vec(const mini_vec& o)
       {
-        std::cout << __FUNCTION__ << '\n';
+#ifndef NDEBUG
+        std::cout << __PRETTY_FUNCTION__ << '\n';
+#endif
         T* new_elem = new T[o.size()];
 
         try {
@@ -50,7 +52,9 @@ namespace App {
 
       mini_vec(mini_vec&& o) : elem{o.elem}, sz{o.sz}
       {
-        std::cout << __FUNCTION__ << '\n';
+#ifndef NDEBUG
+        std::cout << __PRETTY_FUNCTION__ << '\n';
+#endif
         o.elem = nullptr; 
         o.sz = 0;
       }
@@ -76,6 +80,27 @@ namespace App {
       mini_vec& operator=(mini_vec&& o)
       {
         std::swap(*this, o);
+        return *this;
+      }
+
+      mini_vec& operator=(std::initializer_list<T> il)
+      {
+        T* new_elem = new T[il.size()];
+
+        try {
+          std::size_t i = 0;
+          for ( auto&& il_elem : il ) {
+            new_elem[i] = il_elem;
+            ++i;
+          }
+        } catch (...) {
+          delete[] new_elem;
+          throw;
+        }
+
+        elem = new_elem;
+        sz = il.size();
+
         return *this;
       }
 

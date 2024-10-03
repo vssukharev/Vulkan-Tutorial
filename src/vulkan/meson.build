@@ -15,7 +15,9 @@ graphics_source = files(
   'render-pass.cpp',
   'swap-chain.cpp',
   'sync.cpp',
-  'window.cpp'
+  'window.cpp',
+  'vertex-processing.cpp',
+  'vertex-buffer.cpp',
 )
 
 subdir('debug')

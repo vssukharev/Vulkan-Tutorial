@@ -44,12 +44,15 @@ void App::CreateGraphicsPipeline(
   };
 
   // --- Vertex Input ---
+  auto binding_description = GetVertexBindingDescription();
+  auto attribute_descriptions = GetVertexAttributeDescriptions();
+
   VkPipelineVertexInputStateCreateInfo vertex_input_info {};
   vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-  // bindings - is spacing between data and whether the data is per-vertex or per-instance
-  vertex_input_info.vertexBindingDescriptionCount = 0;
-  // attribute descriptions - is type of the attributes passed to the vertex shader, which binding to load them from and at which offset
-  vertex_input_info.pVertexAttributeDescriptions = nullptr;
+  vertex_input_info.vertexBindingDescriptionCount = 1;
+  vertex_input_info.vertexAttributeDescriptionCount = attribute_descriptions.size();
+  vertex_input_info.pVertexBindingDescriptions = &binding_description;
+  vertex_input_info.pVertexAttributeDescriptions = attribute_descriptions.data();
 
   // --- Input Assembly ---
   // Input assembly describes two things:

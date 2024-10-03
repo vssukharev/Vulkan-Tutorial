@@ -15,18 +15,22 @@ void App::DrawFrame(Data& data)
       data.vulkan.command_buffers, 
       data.vulkan.swap_chain,
       data.vulkan.sync, 
-      data.vulkan.queues, 
-      data.vulkan.graphics_pipeline);
+      data.vulkan.queues,
+      data.vulkan.vertices,
+      data.vulkan.graphics_pipeline,
+      data.vulkan.vertex_buffer);
 }
 
 
 void App::DrawFrame(
-    uint32_t& rLastFrame,
-    CommandBuffers& rCommandBuffers,
-    SwapChainComponents& rSwapChain,
-    const SyncObjects& sync,
-    const Queues& queues,
-    VkPipeline graphicsPipeline)
+    uint32_t&             rLastFrame,
+    CommandBuffers&       rCommandBuffers,
+    SwapChainComponents&  rSwapChain,
+    const SyncObjects&    sync,
+    const Queues&         queues,
+    const Vertices&       vertices,
+    VkPipeline            graphicsPipeline,
+    VkBuffer              vertexBuffer)
 {
   vkWaitForFences(
       rSwapChain.device, 
@@ -64,11 +68,13 @@ void App::DrawFrame(
 
   vkResetCommandBuffer(rCommandBuffers[rLastFrame], 0);
   RecordCommandBuffer(
-      rCommandBuffers[rLastFrame], 
+      rCommandBuffers[rLastFrame],
+      vertices,
       rSwapChain.framebuffers[image_index], 
       rSwapChain.extent, 
       rSwapChain.render_pass, 
-      graphicsPipeline);
+      graphicsPipeline,
+      vertexBuffer);
  
 
   VkPipelineStageFlags wait_stages[] = {

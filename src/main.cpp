@@ -1,5 +1,4 @@
 
-#include <cstdlib>
 
 #include <hello-triangle.hpp>
 #include <except.hpp>
@@ -42,5 +41,5 @@ int main() {
   MainLoop(data);
   Cleanup(data);
 
-  return EXIT_SUCCESS;
+  return 0;
 }

@@ -34,9 +34,4 @@
     VK_DRIVER_FILES = /run/opengl-driver/share/vulkan/icd.d/nvidia_icd.x86_64.json;
     # VULKAN_SDK = "${pkgs.vulkan-tools-lunarg}";
     LD_LIBRARY_PATH = "$LD_LIBRARY_PATH:${vulkan-tools-lunarg}/lib";
-    
-
-    # vulkan-loader = vulkan-loader;
-    # glfw2 = glfw2;
-    # glfw = glfw;
   }
